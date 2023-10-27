@@ -1,0 +1,40 @@
+
+
+{% extends 'base.html' %}
+
+
+
+{% block body %} 
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Item Listing</title>
+</head>
+<body>
+    <h1>Item Listing</h1>
+
+    <ul>
+        {% for item in items %}
+            <li>
+                <h2>{{ item.title }}</h2>
+                <p>{{ item.description }}</p>
+                <p>Price: ${{ item.price }}</p>
+                <img src="{{ url_for('project.get_image', image_name= item.image_path) }}" alt="{{ item.title }}" width="200">
+                <form method="POST" action="{{ url_for('project.delete_item', item_id=item.id) }}">
+                    <button type="submit">Delete</button>
+                </form>
+                <form method="POST" action="{{ url_for('project.update_item', item_id=item.id) }}">
+                    <button type="submit">Update</button>
+                </form>
+            </li>
+        {% endfor %}
+    </ul>
+    
+
+    <a href="/sell">Sell an Item</a>  
+</body>
+</html>
+{% endblock %}

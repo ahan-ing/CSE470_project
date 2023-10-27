@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block body %} 
+
+
+<form method="post" enctype="multipart/form-data">
+    {{ form.hidden_tag() }}
+    <div>
+        {{ form.title.label }} {{ form.title(size=32) }}
+    </div>
+    <div>
+        {{ form.description.label }} {{ form.description(cols=32, rows=4) }}
+    </div>
+    <div>
+        {{ form.price.label }} {{ form.price(size=10) }}
+    </div>
+    <div>
+        {{ form.image.label }} {{ form.image }}
+    </div>
+    <div>
+        <input type="submit" value="Submit">
+    </div>
+</form>
+
+<a href="/items">Item list</a>  
+
+{% endblock %}
