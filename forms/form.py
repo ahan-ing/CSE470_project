@@ -4,12 +4,12 @@ from wtforms import StringField, TextAreaField, FloatField, SubmitField,Password
 from wtforms.validators import DataRequired, Email, Length
 
 class SellItemForm(FlaskForm):
-    title = StringField('Title', validators=[DataRequired()])
-    description = TextAreaField('Description')
-    price = FloatField('Price', validators=[DataRequired()])
+    title = StringField('Product name', validators=[DataRequired()])
+    description = TextAreaField('Product description')
+    price = FloatField('Selling price', validators=[DataRequired()])
 
     # Pass allowed extensions to the FileField as an argument
-    image = FileField('Image', validators=[FileAllowed(['jpg', 'png', 'jpeg', 'gif'], 'Images only!')])
+    image = FileField('Add product image', validators=[FileAllowed(['jpg', 'png', 'jpeg', 'gif'], 'Images only!')])
 
     submit = SubmitField('Submit')
 
