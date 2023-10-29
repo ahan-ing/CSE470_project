@@ -29,6 +29,11 @@
                 <form method="POST" action="{{ url_for('project.update_item', item_id=item.id) }}">
                     <button type="submit">Update</button>
                 </form>
+                <form method="POST" action="{{ url_for('project.add_to_cart', item_id=item.id) }}">
+                    <input type="hidden" name="item_id" value="{{ item.id }}">
+                    <button type="submit">Add to Cart</button>
+                </form>
+                
             </li>
         {% endfor %}
     </ul>

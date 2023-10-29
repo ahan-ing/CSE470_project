@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block body %}
+    <h1>Shopping Cart</h1>
+
+    <ul>
+        {% for item in cart_items %}
+            <li>
+                <h2>{{ item.title }}</h2>
+                <p>Price: ${{ item.price }}</p>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

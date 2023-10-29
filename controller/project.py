@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, request, url_for,current_app, send_from_directory,flash
+from flask import Blueprint, render_template, redirect, request, url_for,current_app, send_from_directory,flash, session
 from werkzeug.utils import secure_filename  
 import os
 from models import db
@@ -9,6 +9,8 @@ from forms.form import SellItemForm,UpdateItemForm
 #from app import image_path
 
 project = Blueprint('project',__name__)
+
+cart_items = []
 
 @project.route('/')
 def index():
@@ -117,3 +119,19 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for('login'))
+
+@project.route('/add_to_cart/<int:item_id>', methods=['POST'])
+def add_to_cart(item_id):
+    item = Item.query.get(item_id)
+
+    if item:
+        cart_items.append(item)  # Assuming `cart_items` is a list where you store the items in the cart
+        flash(f'Item {item.title} added to cart!', 'success')
+    else:
+        flash('Item not found', 'error')
+
+    return redirect(url_for('project.item_listing'))
+
+@project.route('/cart')
+def view_cart():
+    return render_template('cart.html', cart_items=cart_items)
