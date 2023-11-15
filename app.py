@@ -6,7 +6,7 @@ from flask_wtf.file import FileField, FileAllowed
 from werkzeug.utils import secure_filename
 from controller.project import project
 from models.tables import Item
-
+from models.tables import db, Article
  
 app = Flask(__name__)
 

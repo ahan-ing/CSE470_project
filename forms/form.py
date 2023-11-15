@@ -18,5 +18,8 @@ class UpdateItemForm(FlaskForm):
     description = TextAreaField('Description')
     price = FloatField('Price', validators=[DataRequired()])
 
-
+class ArticleForm(FlaskForm):
+    title = StringField('Title', validators=[DataRequired()])
+    content = TextAreaField('Content', validators=[DataRequired()])
+    submit = SubmitField('Submit Article')
 

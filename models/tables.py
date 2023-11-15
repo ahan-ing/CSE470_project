@@ -18,3 +18,8 @@ class Item(db.Model):
         self.description = description
         self.price = price
         self.image_path = image_path
+
+class Article(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(255), nullable=False)
+    content = db.Column(db.Text, nullable=False)

@@ -1,14 +1,33 @@
 {% extends 'base.html' %}
 
-{% block body %}
-    <h1>Shopping Cart</h1>
 
-    <ul>
-        {% for item in cart_items %}
-            <li>
-                <h2>{{ item.title }}</h2>
-                <p>Price: ${{ item.price }}</p>
-            </li>
-        {% endfor %}
-    </ul>
+{% block body %}
+    {% if items_in_cart %}
+        <h1>Shopping Cart</h1>
+
+
+        <ul>
+            {% for cart_item in items_in_cart %}
+                <li>
+                    <h2>{{ cart_item.item.title }}</h2>
+                    <p>Price: ${{ cart_item.item.price }}</p>
+                    <p>Quantity: {{ cart_item.quantity }}</p>
+                    <img src="{{ url_for('project.get_image', image_name=cart_item.item.image_path) }}" alt="{{ cart_item.item.title }}" width="100">
+                    <form method="POST" action="{{ url_for('project.remove_from_cart', item_id=cart_item.item.id) }}">
+                        <button type="submit" class="btn btn-danger">Remove</button>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+   
+        <form method="POST" action="{{ url_for('project.checkout') }}">
+            <button type="submit" class="btn btn-primary">Proceed to Checkout</button>
+        </form>
+       
+    {% else %}
+        <p>Your cart is empty. <a href="{{ url_for('project.item_listing') }}">Browse items</a></p>
+    {% endif %}
 {% endblock %}
+   
+
+
