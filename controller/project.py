@@ -7,6 +7,9 @@ from forms.form import SellItemForm, UpdateItemForm
 import traceback
 from flask import render_template
 from models.tables import Article
+from models.tables import Event
+from forms.form import CreateEventForm, ModifyEventForm
+
 
 
 project = Blueprint('project', __name__)
@@ -156,9 +159,6 @@ def view_cart():
 
     return render_template('cart.html', items_in_cart=items_in_cart, total_price=total_price)
 
-
-
-
 @project.route('/payment_confirmation')
 def payment_confirmation():
     try:
@@ -177,7 +177,6 @@ def payment_confirmation():
         print(traceback.format_exc())
         flash('An error occurred during payment confirmation. Please try again later.', 'error')
         return redirect(url_for('project.view_cart'))  # Redirect to the cart if an error occurs
-
 
 @project.route('/checkout', methods=['GET', 'POST'])
 def checkout():
@@ -203,11 +202,6 @@ def articles():
     articles = Article.query.all()
     return render_template('articles.html', articles=articles)
 
-
-
-
-
-
 @project.route('/upload_article', methods=['GET', 'POST'])
 def upload_article():
     if request.method == 'POST':
@@ -224,3 +218,76 @@ def upload_article():
 
 
     return render_template('upload_article.html')
+
+
+## Event Part
+@project.route('/events')
+def events():
+    # Display a list of events
+    events = Event.query.all()
+    return render_template('events.html', events=events)
+
+@project.route('/create_event', methods=['GET', 'POST'])
+def create_event():
+    # Route to create a new event
+    form = CreateEventForm()
+
+    if form.validate_on_submit():
+        # Create a new event and add it to the database
+        new_event = Event(
+            title=form.title.data,
+            description=form.description.data,
+            date=form.date.data,
+            location=form.location.data
+        )
+        db.session.add(new_event)
+        db.session.commit()
+
+        flash('Event created successfully!', 'success')
+        return redirect(url_for('project.events'))
+
+    return render_template('create_event.html', form=form)
+
+@project.route('/events/<int:event_id>')
+def view_event(event_id):
+    # Display details of a specific event
+    event = Event.query.get(event_id)
+    if not event:
+        abort(404)  # Not Found: Event doesn't exist
+
+    return render_template('event_details.html', event=event)
+
+@project.route('/modify_event/<int:event_id>', methods=['GET', 'POST'])
+def modify_event(event_id):
+    # Get the event details from the database
+    event = Event.query.get(event_id)
+
+    if not event:
+        # Handle the case where the event doesn't exist
+        flash('Event not found', 'error')
+        return redirect(url_for('project.events'))
+
+    form = ModifyEventForm(obj=event)
+
+    if form.validate_on_submit():
+        # Update the event details in the database
+        form.populate_obj(event)
+        db.session.commit()
+
+        flash('Event modified successfully!', 'success')
+        return redirect(url_for('project.events'))
+
+    return render_template('modify_event.html', event=event, form=form)
+
+@project.route('/delete_event/<int:event_id>', methods=['POST'])
+def delete_event(event_id):
+    # Delete an event from the database
+    event = Event.query.get(event_id)
+    if event:
+        db.session.delete(event)
+        db.session.commit()
+        flash(f'Event "{event.title}" deleted successfully!', 'success')
+    else:
+        flash('Event not found', 'error')
+
+    return redirect(url_for('project.events'))

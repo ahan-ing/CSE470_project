@@ -1,40 +1,45 @@
-{% extends 'base.html' %}
-{% block title %}Sell Anything{% endblock %}
-{% block body %}
+{% extends 'base.html' %} {% block title %}Sell Anything{% endblock %} {% block
+body %}
 
-<link rel="stylesheet" href="/static/css/style.css">
-<h1 class="form-heading">Sell your used items and help reduce your carbon footprint.</h1>
-
+<link rel="stylesheet" href="/static/css/style.css" />
+<h1 class="form-heading">
+  Sell your used items and help reduce your carbon footprint.
+</h1>
 
 <div class="form-container">
   <form method="post" enctype="multipart/form-data" class="form">
     {{ form.hidden_tag() }}
 
     <div class="form-group">
-        <label class="form-label" for="title">{{ form.title.label }}</label>
-        {{ form.title(size=32, class="form-control", placeholder="Write what you want to sell") }}
-      </div>
-    
-      <div class="form-group">
-        <label class="form-label" for="description">{{ form.description.label }}</label>
-        {{ form.description(cols=32, rows=4, class="form-control",placeholder="More details = more interested buyers!") }}
-      </div>
-    
-      <div class="form-group">
-        <label class="form-label" for="price">{{ form.price.label }}</label>
-        {{ form.price(size=10, class="form-control",placeholder="Pick a good price - what would you pay?") }}
-      </div>
-    
-      <div class="form-group">
-        <label class="form-label" for="image">{{ form.image.label }}</label>
-        {{ form.image(class="form-control") }}
-      </div>
+      <label class="form-label" for="title">{{ form.title.label }}</label>
+      {{ form.title(size=32, class="form-control", placeholder="Write what you
+      want to sell") }}
+    </div>
 
-      <div class="form-group button-group">
-        <input type="submit" value="Post ad" class="btn btn-success">
-        <a href="/items" class="btn btn-secondary">Your listings</a>
-      </div>      
+    <div class="form-group">
+      <label class="form-label" for="description"
+        >{{ form.description.label }}</label
+      >
+      {{ form.description(cols=32, rows=4,
+      class="form-control",placeholder="More details = more interested buyers!")
+      }}
+    </div>
 
+    <div class="form-group">
+      <label class="form-label" for="price">{{ form.price.label }}</label>
+      {{ form.price(size=10, class="form-control",placeholder="Pick a good price
+      - what would you pay?") }}
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="image">{{ form.image.label }}</label>
+      {{ form.image(class="form-control") }}
+    </div>
+
+    <div class="form-group button-group">
+      <input type="submit" value="Post ad" class="btn btn-success" />
+      <a href="/items" class="btn btn-secondary">Your listings</a>
+    </div>
   </form>
 </div>
 

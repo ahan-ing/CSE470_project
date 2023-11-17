@@ -1,0 +1,31 @@
+<!-- templates/create_event.html -->
+{% extends 'base.html' %} {% block title %}Create Event{% endblock %} {% block
+head %}
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"
+/>
+{% endblock %} {% block body %}
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<div class="container">
+  <h1>Create Event</h1>
+  <form method="POST" action="{{ url_for('project.create_event') }}">
+    {{ form.hidden_tag() }}
+    <div class="mb-3">{{ form.title.label }} {{ form.title() }}</div>
+    <div class="mb-3">
+      {{ form.description.label }} {{ form.description() }}
+    </div>
+    <div class="mb-3">{{ form.date.label }} {{ form.date() }}</div>
+    <div class="mb-3">{{ form.location.label }} {{ form.location() }}</div>
+
+    <button type="submit" class="btn btn-primary">Create Event</button>
+  </form>
+  {# Initialize flatpickr for the date field #}
+  <script>
+    flatpickr(".flatpickr", {
+      enableTime: true,
+      dateFormat: "Y-m-d H:i:S",
+    });
+  </script>
+</div>
+{% endblock %}

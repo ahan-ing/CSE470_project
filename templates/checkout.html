@@ -1,26 +1,23 @@
-{% extends 'base.html' %}
+{% extends 'base.html' %} {% block body %}
+<h1>Checkout</h1>
 
+<ul>
+  {% for cart_item in items_in_cart %}
+  <li>
+    <h2>{{ cart_item.item.title }}</h2>
+    <p>Price: ${{ cart_item.item.price }}</p>
+    <p>Quantity: {{ cart_item.quantity }}</p>
+    <img
+      src="{{ url_for('project.get_image', image_name=cart_item.item.image_path) }}"
+      alt="{{ cart_item.item.title }}"
+      width="100"
+    />
+  </li>
+  {% endfor %}
+</ul>
 
-{% block body %}
-    <h1>Checkout</h1>
+<p>Total Price: ${{ total_price }}</p>
 
-
-    <ul>
-        {% for cart_item in items_in_cart %}
-            <li>
-                <h2>{{ cart_item.item.title }}</h2>
-                <p>Price: ${{ cart_item.item.price }}</p>
-                <p>Quantity: {{ cart_item.quantity }}</p>
-                <img src="{{ url_for('project.get_image', image_name=cart_item.item.image_path) }}" alt="{{ cart_item.item.title }}" width="100">
-            </li>
-        {% endfor %}
-    </ul>
-
-
-    <p>Total Price: ${{ total_price }}</p>
-
-
-    <!-- Additional information or forms for payment can be added here -->
-
+<!-- Additional information or forms for payment can be added here -->
 
 {% endblock %}

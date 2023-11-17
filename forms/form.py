@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
-from wtforms import StringField, TextAreaField, FloatField, SubmitField,PasswordField
+from wtforms import StringField, TextAreaField, FloatField, SubmitField,PasswordField,DateTimeField
 from wtforms.validators import DataRequired, Email, Length
 
 class SellItemForm(FlaskForm):
@@ -23,3 +23,14 @@ class ArticleForm(FlaskForm):
     content = TextAreaField('Content', validators=[DataRequired()])
     submit = SubmitField('Submit Article')
 
+class CreateEventForm(FlaskForm):
+    title = StringField('Title', validators=[DataRequired()])
+    description = TextAreaField('Description')
+    date = DateTimeField('Date', format='%Y-%m-%d %H:%M:%S', validators=[DataRequired()], render_kw={'class': 'flatpickr'})
+    location = StringField('Location')
+
+class ModifyEventForm(FlaskForm):
+    title = StringField('Title', validators=[DataRequired()])
+    description = StringField('Description', validators=[DataRequired()])
+    date = DateTimeField('Date', format='%Y-%m-%d %H:%M:%S', validators=[DataRequired()])
+    location = StringField('Location', validators=[DataRequired()])

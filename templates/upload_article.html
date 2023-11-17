@@ -1,27 +1,16 @@
 <!-- upload_article.html -->
 
+{% extends 'base.html' %} {% block title %}Upload Blog{% endblock %} {% block
+body %}
+<h1>Upload Blog</h1>
 
-{% extends 'base.html' %}
+<form method="POST" action="{{ url_for('project.upload_article') }}">
+  <label for="title">Title:</label>
+  <input type="text" name="title" required />
 
+  <label for="content">Content:</label>
+  <textarea name="content" rows="5" required></textarea>
 
-{% block title %}Upload Blog{% endblock %}
-
-
-{% block body %}
-    <h1>Upload Blog</h1>
-
-
-    <form method="POST" action="{{ url_for('project.upload_article') }}">
-        <label for="title">Title:</label>
-        <input type="text" name="title" required>
-
-
-        <label for="content">Content:</label>
-        <textarea name="content" rows="5" required></textarea>
-
-
-        <button type="submit">Upload Blog</button>
-    </form>
+  <button type="submit">Upload Blog</button>
+</form>
 {% endblock %}
-
-

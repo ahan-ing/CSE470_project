@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, Float, ForeignKey
 from flask_sqlalchemy import SQLAlchemy
-
+from datetime import datetime
 
 db=SQLAlchemy()
 
@@ -23,3 +23,10 @@ class Article(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(255), nullable=False)
     content = db.Column(db.Text, nullable=False)
+
+class Event(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.Text, nullable=True)
+    date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    location = db.Column(db.String(100), nullable=True)

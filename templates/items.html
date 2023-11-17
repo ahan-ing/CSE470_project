@@ -1,37 +1,40 @@
-{% extends 'base.html' %}
+{% extends 'base.html' %} {% block title %}Marketplace{% endblock %} {% block
+body %}
+<h1>Today's Picks</h1>
 
+<ul>
+  {% for item in items %}
+  <li>
+    <h2>{{ item.title }}</h2>
+    <p>{{ item.description }}</p>
+    <p>Price: ${{ item.price }}</p>
+    <img
+      src="{{ url_for('project.get_image', image_name=item.image_path) }}"
+      alt="{{ item.title }}"
+      width="200"
+    />
+    <form
+      method="POST"
+      action="{{ url_for('project.delete_item', item_id=item.id) }}"
+    >
+      <button type="submit" class="btn btn-danger">Delete</button>
+    </form>
+    <form
+      method="POST"
+      action="{{ url_for('project.update_item', item_id=item.id) }}"
+    >
+      <button type="submit" class="btn btn-warning">Update</button>
+    </form>
+    <form
+      method="POST"
+      action="{{ url_for('project.add_to_cart', item_id=item.id) }}"
+    >
+      <input type="hidden" name="item_id" value="{{ item.id }}" />
+      <button type="submit" class="btn btn-success">Add to Cart</button>
+    </form>
+  </li>
+  {% endfor %}
+</ul>
 
-{% block title %}Marketplace{% endblock %}
-
-
-{% block body %}
-    <h1>Today's Picks</h1>
-
-
-    <ul>
-        {% for item in items %}
-            <li>
-                <h2>{{ item.title }}</h2>
-                <p>{{ item.description }}</p>
-                <p>Price: ${{ item.price }}</p>
-                <img src="{{ url_for('project.get_image', image_name=item.image_path) }}" alt="{{ item.title }}" width="200">
-                <form method="POST" action="{{ url_for('project.delete_item', item_id=item.id) }}">
-                    <button type="submit" class="btn btn-danger">Delete</button>
-                </form>
-                <form method="POST" action="{{ url_for('project.update_item', item_id=item.id) }}">
-                    <button type="submit" class="btn btn-warning">Update</button>
-                </form>
-                <form method="POST" action="{{ url_for('project.add_to_cart', item_id=item.id) }}">
-                    <input type="hidden" name="item_id" value="{{ item.id }}">
-                    <button type="submit" class="btn btn-success">Add to Cart</button>
-                </form>
-            </li>
-        {% endfor %}
-    </ul>
-
-
-    <a href="{{ url_for('project.sell_item') }}">Sell an Item</a>  
+<a href="{{ url_for('project.sell_item') }}">Sell an Item</a>
 {% endblock %}
-
-
-
