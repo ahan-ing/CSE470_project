@@ -171,12 +171,13 @@ def payment_confirmation():
 
         total_price = sum(int(cart_item['item'].price) * int(cart_item['quantity']) for cart_item in items_in_cart)
 
-        return render_template('payment_confirmation.html', total_price=total_price)
+        return render_template('payment_confirmation.html', items_in_cart=items_in_cart, total_price=total_price)
     except Exception as e:
         print(f"An error occurred: {e}")
         print(traceback.format_exc())
         flash('An error occurred during payment confirmation. Please try again later.', 'error')
         return redirect(url_for('project.view_cart'))  # Redirect to the cart if an error occurs
+
 
 @project.route('/checkout', methods=['GET', 'POST'])
 def checkout():
@@ -214,7 +215,7 @@ def upload_article():
         db.session.commit()
 
 
-        flash('Article uploaded successfully!', 'success')
+        flash('Blog uploaded successfully!', 'success')
 
 
     return render_template('upload_article.html')
@@ -291,3 +292,20 @@ def delete_event(event_id):
         flash('Event not found', 'error')
 
     return redirect(url_for('project.events'))
+
+
+@project.route('/item/<int:item_id>')
+def view_item(item_id):
+    item = Item.query.get_or_404(item_id)
+    return render_template('item_detail.html', item=item)
+
+
+@project.route('/search', methods=['GET'])
+def search():
+    query = request.args.get('query')  # Get the search query from the URL parameter
+    if query:
+        # Assuming 'Item' is your model for products
+        results = Item.query.filter(Item.title.contains(query)).all()
+        return render_template('search_results.html', results=results)
+    else:
+        return render_template('search_results.html', results=[])

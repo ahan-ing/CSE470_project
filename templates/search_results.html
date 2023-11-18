@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block body %}
+  <h2>Search Results</h2>
+  <div class="container">
+    {% for item in results %}
+      <div class="row mb-4">
+        <div class="col-md-4">
+          <!-- Display the product image -->
+          <img src="{{ url_for('project.get_image', image_name=item.image_path) }}" alt="{{ item.title }}" class="img-fluid">
+        </div>
+        <div class="col-md-8">
+          <!-- Display the product title -->
+          <h3>{{ item.title }}</h3>
+          <!-- Display the product description -->
+          <p>{{ item.description }}</p>
+          <!-- Display the product price -->
+          <p><strong>Price:</strong> {{ item.price }}</p>
+          <!-- Add a link to view more details or add to cart -->
+          <form action="{{ url_for('project.add_to_cart', item_id=item.id) }}" method="post">
+            <button type="submit" class="btn btn-primary">Add to Cart</button>
+          </form>
+          
+        </div>
+      </div>
+    {% else %}
+      <p>No results found.</p>
+    {% endfor %}
+  </div>
+{% endblock %}
+
