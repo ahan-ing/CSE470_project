@@ -9,7 +9,8 @@ from flask import render_template
 from models.tables import Article
 from models.tables import Event
 from forms.form import CreateEventForm, ModifyEventForm
-
+from models.tables import Vlog
+from forms.form import UploadVlogForm
 
 
 project = Blueprint('project', __name__)
@@ -220,6 +221,19 @@ def upload_article():
 
     return render_template('upload_article.html')
 
+@project.route('/remove_article/<int:article_id>', methods=['POST'])
+def remove_article(article_id):
+    try:
+        article = Article.query.get_or_404(article_id)
+        db.session.delete(article)
+        db.session.commit()
+        flash('Blog removed successfully!', 'success')
+        return redirect(url_for('project.articles'))
+    except Exception as e:
+        flash('An error occurred while removing the article. Please try again later.', 'error')
+        return redirect(url_for('project.articles'))
+
+
 
 ## Event Part
 @project.route('/events')
@@ -300,12 +314,77 @@ def view_item(item_id):
     return render_template('item_detail.html', item=item)
 
 
+#@project.route('/search', methods=['GET'])
+#def search():
+#    query = request.args.get('query')  # Get the search query from the URL parameter
+#    if query:
+        # Assuming 'Item' is your model for products
+        #results = Item.query.filter(Item.title.contains(query)).all()
+        #return render_template('search_results.html', results=results)
+    #else:
+        #return render_template('search_results.html', results=[])
+
+@project.route('/vlogs')
+def vlogs():
+    vlogs = Vlog.query.all()
+    return render_template('vlogs.html', vlogs=vlogs)
+
+
+@project.route('/upload_vlog', methods=['GET', 'POST'])
+def upload_vlog():
+    form = UploadVlogForm()
+
+
+    if form.validate_on_submit():
+        title = form.title.data
+        description = form.description.data
+        youtube_link = form.youtube_link.data
+
+
+        new_vlog = Vlog(title=title, description=description, youtube_link=youtube_link)
+
+
+        db.session.add(new_vlog)
+        db.session.commit()
+
+
+        flash('Vlog uploaded successfully!', 'success')
+        return redirect(url_for('project.vlogs'))
+
+
+    return render_template('upload_vlog.html', form=form)
+
+
+
+
+@project.route('/remove_vlog/<int:vlog_id>', methods=['POST'])
+def remove_vlog(vlog_id):
+    vlog = Vlog.query.get_or_404(vlog_id)
+
+
+    db.session.delete(vlog)
+    db.session.commit()
+
+
+    flash('Vlog removed successfully!', 'success')
+    return redirect(url_for('project.vlogs'))
+
+
+
+
 @project.route('/search', methods=['GET'])
 def search():
-    query = request.args.get('query')  # Get the search query from the URL parameter
-    if query:
-        # Assuming 'Item' is your model for products
-        results = Item.query.filter(Item.title.contains(query)).all()
-        return render_template('search_results.html', results=results)
-    else:
-        return render_template('search_results.html', results=[])
+    query = request.args.get('query', '').strip()
+
+
+    if not query:
+        flash('Please enter a search query.', 'warning')
+        return redirect(url_for('project.item_listing'))
+
+
+    # Perform the search logic based on your requirements
+    # Example: You may want to search for items in the database
+    items = Item.query.filter(Item.title.ilike(f"%{query}%")).all()
+
+
+    return render_template('search_results.html', query=query, items=items)

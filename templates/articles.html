@@ -1,16 +1,23 @@
-<!-- articles.html -->
+{% extends 'base.html' %}
 
-<!-- articles.html -->
 
-{% extends 'base.html' %} {% block title %}Blogs{% endblock %} {% block body %}
-<h1>Blogs</h1>
+{% block title %}Blogs{% endblock %}
 
-<ul>
-  {% for article in articles %}
-  <li>
-    <h2>{{ article.title }}</h2>
-    <p>{{ article.content }}</p>
-  </li>
-  {% endfor %}
-</ul>
+
+{% block body %}
+    <h1>Blogs</h1>
+
+
+    <ul>
+        {% for article in articles %}
+            <li>
+                <h2>{{ article.title }}</h2>
+                <p>{{ article.content }}</p>
+                <form method="POST" action="{{ url_for('project.remove_article', article_id=article.id) }}">
+                    <button type="submit" class="btn btn-danger">Remove</button>
+                </form>
+            </li>
+        {% endfor %}
+    </ul>
 {% endblock %}
+

@@ -30,3 +30,12 @@ class Event(db.Model):
     description = db.Column(db.Text, nullable=True)
     date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     location = db.Column(db.String(100), nullable=True)
+
+class Vlog(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.Text)
+    youtube_link = db.Column(db.String(100), nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    def get_embedded_link(self):
+        return f"https://www.youtube.com/embed/{self.youtube_link.split('/')[-1]}"

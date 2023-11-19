@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+
+{% block title %}Upload Vlog{% endblock %}
+
+
+{% block body %}
+    <h1>Upload a Vlog</h1>
+    <form method="POST" action="{{ url_for('project.upload_vlog') }}">
+        {{ form.hidden_tag() }}
+        {{ form.title.label }} {{ form.title }}
+        {{ form.description.label }} {{ form.description }}
+        {{ form.youtube_link.label }} {{ form.youtube_link }}
+        {{ form.submit }}
+    </form>
+{% endblock %}

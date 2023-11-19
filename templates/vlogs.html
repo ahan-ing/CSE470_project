@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+
+{% block title %}Vlogs{% endblock %}
+
+
+{% block body %}
+    <h1>Vlogs</h1>
+
+
+    <ul>
+        {% for vlog in vlogs %}
+            <li>
+                <h2>{{ vlog.title }}</h2>
+                <p>{{ vlog.description }}</p>
+                <p><a href="{{ vlog.youtube_link }}" target="_blank">Watch on YouTube</a></p>
+                <form method="POST" action="{{ url_for('project.remove_vlog', vlog_id=vlog.id) }}">
+                    <button type="submit" class="btn btn-danger">Remove</button>
+                </form>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}
