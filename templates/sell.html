@@ -35,6 +35,7 @@ body %}
       <label class="form-label" for="image">{{ form.image.label }}</label>
       {{ form.image(class="form-control") }}
     </div>
+    {{ form.is_approved() }}
 
     <div class="form-group button-group">
       <input type="submit" value="Post ad" class="btn btn-success" />

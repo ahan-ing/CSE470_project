@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signup</title>
+</head>
+<body>
+    <h2>Signup</h2>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul>
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+    <form method="post" action="{{ url_for('project.signup') }}">
+        {{ form.hidden_tag() }}
+    
+        <label for="username">Username:</label>
+        {{ form.username() }}
+    
+        <label for="email">Email:</label>
+        {{ form.email() }}
+    
+        <label for="password">Password:</label>
+        {{ form.password() }}
+    
+        <label for="confirm_password">Confirm Password:</label>
+        {{ form.confirm_password() }}
+
+        <label for="user_type">User Type:</label>
+        <input type="radio" name="user_type" value="seller" required> Seller
+        <input type="radio" name="user_type" value="buyer" required> Buyer
+        <input type="radio" name="user_type" value="event_maker"> Event Maker
+        <input type="radio" name="user_type" value="volunteer"> Volunteer
+    
+        <button type="submit">Signup</button>
+    </form>
+    <p>If you have an account, <a href="{{ url_for('project.login') }}" style="color: rgb(240, 31, 146)">login here</a>.</p>
+
+</body>
+</html>

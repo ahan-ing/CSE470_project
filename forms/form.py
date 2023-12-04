@@ -1,17 +1,14 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
-from wtforms import StringField, TextAreaField, FloatField, SubmitField,PasswordField,DateTimeField
-from wtforms.validators import DataRequired, Email, Length
-from wtforms.validators import DataRequired, Email, Length, URL
+from wtforms import StringField, TextAreaField, FloatField, SubmitField,PasswordField,DateTimeField,BooleanField
+from wtforms.validators import DataRequired, Email, Length,URL, EqualTo, Email
 
 class SellItemForm(FlaskForm):
     title = StringField('Product name', validators=[DataRequired()])
     description = TextAreaField('Product description')
     price = FloatField('Selling price', validators=[DataRequired()])
-
-    # Pass allowed extensions to the FileField as an argument
     image = FileField('Add product image', validators=[FileAllowed(['jpg', 'png', 'jpeg', 'gif'], 'Images only!')])
-
+    is_approved = BooleanField('Admin Approval', default=False, render_kw={'style': 'display: none'})
     submit = SubmitField('Submit')
 
 class UpdateItemForm(FlaskForm):
@@ -23,6 +20,8 @@ class ArticleForm(FlaskForm):
     title = StringField('Title', validators=[DataRequired()])
     content = TextAreaField('Content', validators=[DataRequired()])
     submit = SubmitField('Submit Article')
+    is_approved = BooleanField('Admin Approval', default=False, render_kw={'style': 'display: none'})
+
 
 class CreateEventForm(FlaskForm):
     title = StringField('Title', validators=[DataRequired()])
@@ -41,3 +40,17 @@ class UploadVlogForm(FlaskForm):
     description = TextAreaField('Description')
     youtube_link = StringField('YouTube Link', validators=[DataRequired(), URL()])
     submit = SubmitField('Submit')
+    is_approved = BooleanField('Admin Approval', default=False, render_kw={'style': 'display: none'})
+   
+
+class LoginForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired(), Length(min=2, max=20)])
+    password = PasswordField('Password', validators=[DataRequired()])
+    submit = SubmitField('Login')
+
+class SignupForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired(), Length(min=2, max=20)])
+    email = StringField('Email', validators=[DataRequired(), Email()]) 
+    password = PasswordField('Password', validators=[DataRequired()])
+    confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
+    submit = SubmitField('Signup')

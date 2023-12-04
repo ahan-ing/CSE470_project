@@ -1,89 +1,114 @@
-from flask import Blueprint, render_template, redirect, request, url_for, current_app, send_from_directory, flash
+from flask import Blueprint, render_template, redirect, request, url_for, current_app, send_from_directory, flash,abort
 from werkzeug.utils import secure_filename
+from flask_bcrypt import Bcrypt
+from werkzeug.security import check_password_hash, generate_password_hash
+from flask_login import login_user, logout_user, login_required, current_user,login_manager,LoginManager, UserMixin
 import os
 from models import db
-from models.tables import Item
-from forms.form import SellItemForm, UpdateItemForm
+from models.tables import *
+from models.cart import *
+from forms.form import *
 import traceback
-from flask import render_template
-from models.tables import Article
-from models.tables import Event
-from forms.form import CreateEventForm, ModifyEventForm
-from models.tables import Vlog
-from forms.form import UploadVlogForm
+import traceback
 
 
 project = Blueprint('project', __name__)
+bcrypt = Bcrypt()
 cart_items = {}
+
 
 @project.route('/')
 def index():
     return render_template('index.html')
 
+
 @project.route('/items')
 def item_listing():
-    items = Item.query.all()
+    if current_user.is_authenticated:
+        if current_user.user_type == 'seller':
+            items = Item.query.filter_by(seller_id=current_user.id, is_approved=True).all()
+        else:
+            items = Item.query.filter_by(is_approved=True).all()
+    else:
+        items = Item.query.filter_by(is_approved=True).all()
+
     return render_template('items.html', items=items)
+
+
 
 @project.route('/imgages/<image_name>')
 def get_image(image_name):
     return send_from_directory(current_app.config['UPLOAD_FOLDER'], image_name)
 
+
+
 @project.route('/sell', methods=['GET', 'POST'])
+@login_required
 def sell_item():
     form = SellItemForm()
-
     if form.validate_on_submit():
         title = form.title.data
         description = form.description.data
         price = form.price.data
         image = form.image.data
-
         if image:
             filename = secure_filename(image.filename)
             image.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
-
-            new_item = Item(title=title, description=description, price=price, image_path=filename)
-
+            is_approved = current_user.is_admin
+            new_item = Item(title=title, description=description, price=price, image_path=filename, seller_id=current_user.id,is_approved=is_approved)
             db.session.add(new_item)
             db.session.commit()
-            return redirect(url_for('project.item_listing'))
+            flash('Item added successfully. Awaiting admin approval.', 'success')
+            return redirect(url_for('project.index'))
+    return render_template('sell.html', form=form), 200 
 
-    return render_template('sell.html', form=form)
 
-@project.route('/delete/<int:item_id>', methods=['POST'])
-def delete_item(item_id):
-    item = Item.query.get(item_id)
-    if item:
-        db.session.delete(item)
-        db.session.commit()
-        flash(f'Item {item.title} deleted successfully!', 'success')
+
+def view_item(item_id):
+    item = Item.query.get_or_404(item_id)
+    if current_user.is_authenticated and item.seller_id == current_user.id:
+        return render_template('view_item.html', item=item)
     else:
-        flash('Item not found', 'error')
-    return redirect(url_for('project.item_listing'))
+        flash('You do not have permission to view this item.', 'danger')
+        return redirect(url_for('project.index'))
 
-@project.route('/update/<int:item_id>', methods=['GET', 'POST'])
+
+
+@project.route('/delete_item/<int:item_id>', methods=['POST'])
+@login_required
+def delete_item(item_id):
+    item = Item.query.get_or_404(item_id)
+    if item.seller_id != current_user.id:
+        abort(403)  
+    db.session.delete(item)
+    db.session.commit()
+    flash('Item deleted successfully!', 'success')
+    return redirect(url_for('project.items'))
+
+
+
+@project.route('/update_item/<int:item_id>', methods=['GET', 'POST'])
+@login_required
 def update_item(item_id):
-    item = Item.query.get(item_id)
-
-    if not item:
-        abort(404)  # Not Found: Item doesn't exist
-
-    form = UpdateItemForm(obj=item)  # Create a form and pre-fill with item data
-
+    item = Item.query.get_or_404(item_id)
+    if item.seller_id != current_user.id:
+        abort(403) 
+    form = UpdateItemForm()
     if form.validate_on_submit():
-        # Update the item with the form data
-        form.populate_obj(item)
-        db.session.commit()
-
-        flash(f'Item {item.title} updated successfully!', 'success')
-
-        return redirect(url_for('project.item_listing'))
-
+            item.title = form.title.data
+            item.description = form.description.data
+            item.price = form.price.data
+            item.image_path = form.image_path.data
+            db.session.commit()
+            flash('Item successfully updated!', 'success')
+            return redirect(url_for('project.items', item_id=item.id))
     return render_template('update.html', form=form, item=item)
+    
 
 def load_user(user_id):
     return User.query.get(int(user_id))
+
+
 
 @project.route('/register', methods=['GET', 'POST'])
 def register():
@@ -97,46 +122,28 @@ def register():
         return redirect(url_for('login'))
     return render_template('register.html', form=form)
 
-@project.route('/login', methods=['GET', 'POST'])
-def login():
-    form = LoginForm()
-    if form.validate_on_submit():
-        user = User.query.filter((User.email == form.email.data) | (User.phone_number == form.email.data)).first()
-        if user and user.check_password(form.password.data):
-            login_user(user)
-            flash('Login successful.', 'success')
-            return redirect(url_for('dashboard'))
-        flash('Login failed. Please check your credentials.', 'danger')
-    return render_template('login.html', form=form)
 
-@project.route("/logout")
-def logout():
-    logout_user()
-    return redirect(url_for('login'))
 
 @project.route('/add_to_cart/<int:item_id>', methods=['POST'])
 def add_to_cart(item_id):
     item = Item.query.get(item_id)
-
     if item:
-        # Add the item to the cart or increment its quantity if already in the cart
         cart_items[item.id] = cart_items.get(item.id, 0) + 1
         flash(f'Item {item.title} added to cart!', 'success')
     else:
         flash('Item not found', 'error')
-
     return redirect(url_for('project.item_listing'))
+
+
 
 @project.route('/remove_from_cart/<int:item_id>', methods=['POST'])
 def remove_from_cart(item_id):
     item = Item.query.get(item_id)
-
     if item:
-        # Remove the item from the cart or decrease its quantity
         if item.id in cart_items:
             cart_items[item.id] -= 1
             if cart_items[item.id] == 0:
-                del cart_items[item.id]  # Remove the item from the cart if quantity is zero
+                del cart_items[item.id]  
             flash(f'Removed one {item.title} from the cart!', 'success')
         else:
             flash('Item not found in the cart', 'error')
@@ -145,20 +152,22 @@ def remove_from_cart(item_id):
 
     return redirect(url_for('project.view_cart'))
 
+
+
 @project.route('/cart')
 def view_cart():
     items_in_cart = []
 
-    print(f"cart_items type: {type(cart_items)}")  # Debug print
+    print(f"cart_items type: {type(cart_items)}")  
 
     for item_id, quantity in cart_items.items():
         item = Item.query.get(item_id)
         if item:
             items_in_cart.append({'item': item, 'quantity': quantity})
-
     total_price = sum(int(cart_item['item'].price) * int(cart_item['quantity']) for cart_item in items_in_cart)
-
     return render_template('cart.html', items_in_cart=items_in_cart, total_price=total_price)
+
+
 
 @project.route('/payment_confirmation')
 def payment_confirmation():
@@ -171,7 +180,6 @@ def payment_confirmation():
                 items_in_cart.append({'item': item, 'quantity': quantity})
 
         total_price = sum(int(cart_item['item'].price) * int(cart_item['quantity']) for cart_item in items_in_cart)
-
         return render_template('payment_confirmation.html', items_in_cart=items_in_cart, total_price=total_price)
     except Exception as e:
         print(f"An error occurred: {e}")
@@ -180,18 +188,13 @@ def payment_confirmation():
         return redirect(url_for('project.view_cart'))  # Redirect to the cart if an error occurs
 
 
+
 @project.route('/checkout', methods=['GET', 'POST'])
 def checkout():
     try:
         if request.method == 'POST':
-            # No payment processing logic here, as we are not assuming payment success
-
-            # Redirect to a confirmation page without clearing the cart
             return redirect(url_for('project.payment_confirmation'))
-
-        # Calculate total_price here
         total_price = sum(int(cart_items.get(item_id, 0)['item'].price) * int(cart_items.get(item_id, 0)['quantity']) for item_id in cart_items)
-
         return render_template('checkout.html', total_price=total_price)
     except Exception as e:
         print(f"An error occurred: {e}")
@@ -199,27 +202,28 @@ def checkout():
         flash('An error occurred during checkout. Please try again later.', 'error')
         return redirect(url_for('project.view_cart'))
 
+
+
 @project.route('/articles')
 def articles():
     articles = Article.query.all()
     return render_template('articles.html', articles=articles)
+
+
 
 @project.route('/upload_article', methods=['GET', 'POST'])
 def upload_article():
     if request.method == 'POST':
         title = request.form.get('title')
         content = request.form.get('content')
-
-
-        new_article = Article(title=title, content=content)
+        is_approved = current_user.is_admin
+        new_article = Article(title=title, content=content, is_approved=is_approved)
         db.session.add(new_article)
         db.session.commit()
-
-
-        flash('Blog uploaded successfully!', 'success')
-
-
+        flash('Blog added successfully. Awaiting admin approval.', 'success')
     return render_template('upload_article.html')
+
+
 
 @project.route('/remove_article/<int:article_id>', methods=['POST'])
 def remove_article(article_id):
@@ -235,68 +239,59 @@ def remove_article(article_id):
 
 
 
-## Event Part
+
 @project.route('/events')
 def events():
-    # Display a list of events
-    events = Event.query.all()
+    events = Event.query.filter_by(is_approved=True).all()
     return render_template('events.html', events=events)
+
 
 @project.route('/create_event', methods=['GET', 'POST'])
 def create_event():
-    # Route to create a new event
     form = CreateEventForm()
-
     if form.validate_on_submit():
-        # Create a new event and add it to the database
+        is_approved = current_user.is_admin
         new_event = Event(
             title=form.title.data,
             description=form.description.data,
             date=form.date.data,
-            location=form.location.data
+            location=form.location.data,
+            is_approved=is_approved
         )
         db.session.add(new_event)
         db.session.commit()
-
-        flash('Event created successfully!', 'success')
-        return redirect(url_for('project.events'))
-
+        flash('Event created successfully. Awaiting admin approval.', 'success')
+        return redirect(url_for('project.index'))
     return render_template('create_event.html', form=form)
+
+
 
 @project.route('/events/<int:event_id>')
 def view_event(event_id):
-    # Display details of a specific event
     event = Event.query.get(event_id)
     if not event:
-        abort(404)  # Not Found: Event doesn't exist
-
+        abort(404)  
     return render_template('event_details.html', event=event)
 
-@project.route('/modify_event/<int:event_id>', methods=['GET', 'POST'])
-def modify_event(event_id):
-    # Get the event details from the database
-    event = Event.query.get(event_id)
 
+@project.route('/modify_event/<int:event_id>', methods=['GET', 'POST'])
+def modify_event(event_id): 
+    event = Event.query.get(event_id)
     if not event:
-        # Handle the case where the event doesn't exist
         flash('Event not found', 'error')
         return redirect(url_for('project.events'))
-
     form = ModifyEventForm(obj=event)
-
     if form.validate_on_submit():
-        # Update the event details in the database
         form.populate_obj(event)
         db.session.commit()
-
         flash('Event modified successfully!', 'success')
         return redirect(url_for('project.events'))
-
     return render_template('modify_event.html', event=event, form=form)
+
+
 
 @project.route('/delete_event/<int:event_id>', methods=['POST'])
 def delete_event(event_id):
-    # Delete an event from the database
     event = Event.query.get(event_id)
     if event:
         db.session.delete(event)
@@ -304,14 +299,9 @@ def delete_event(event_id):
         flash(f'Event "{event.title}" deleted successfully!', 'success')
     else:
         flash('Event not found', 'error')
-
     return redirect(url_for('project.events'))
 
 
-@project.route('/item/<int:item_id>')
-def view_item(item_id):
-    item = Item.query.get_or_404(item_id)
-    return render_template('item_detail.html', item=item)
 
 
 #@project.route('/search', methods=['GET'])
@@ -330,28 +320,20 @@ def vlogs():
     return render_template('vlogs.html', vlogs=vlogs)
 
 
+
 @project.route('/upload_vlog', methods=['GET', 'POST'])
 def upload_vlog():
     form = UploadVlogForm()
-
-
     if form.validate_on_submit():
         title = form.title.data
         description = form.description.data
         youtube_link = form.youtube_link.data
-
-
-        new_vlog = Vlog(title=title, description=description, youtube_link=youtube_link)
-
-
+        is_approved = current_user.is_admin
+        new_vlog = Vlog(title=title, description=description, youtube_link=youtube_link, is_approved=is_approved)
         db.session.add(new_vlog)
         db.session.commit()
-
-
-        flash('Vlog uploaded successfully!', 'success')
+        flash('Vlog added successfully. Awaiting admin approval.', 'success')
         return redirect(url_for('project.vlogs'))
-
-
     return render_template('upload_vlog.html', form=form)
 
 
@@ -360,12 +342,8 @@ def upload_vlog():
 @project.route('/remove_vlog/<int:vlog_id>', methods=['POST'])
 def remove_vlog(vlog_id):
     vlog = Vlog.query.get_or_404(vlog_id)
-
-
     db.session.delete(vlog)
     db.session.commit()
-
-
     flash('Vlog removed successfully!', 'success')
     return redirect(url_for('project.vlogs'))
 
@@ -375,16 +353,190 @@ def remove_vlog(vlog_id):
 @project.route('/search', methods=['GET'])
 def search():
     query = request.args.get('query', '').strip()
-
-
     if not query:
         flash('Please enter a search query.', 'warning')
         return redirect(url_for('project.item_listing'))
-
-
-    # Perform the search logic based on your requirements
-    # Example: You may want to search for items in the database
     items = Item.query.filter(Item.title.ilike(f"%{query}%")).all()
-
-
     return render_template('search_results.html', query=query, items=items)
+from flask_bcrypt import Bcrypt
+
+
+
+
+
+
+@project.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        user = User.query.filter_by(username=username).first()
+        if user and bcrypt.check_password_hash(user.password, password):
+            login_user(user)     
+            flash('Login successful!', 'success')
+            return redirect(url_for('project.index'))
+        else:
+            flash('Login unsuccessful. Check username and password.', 'danger')
+    return render_template('login.html')
+
+
+
+@project.route('/signup', methods=['GET', 'POST'])
+def signup():
+    form = SignupForm()
+    if form.validate_on_submit():
+        username = form.username.data
+        email = form.email.data
+        password = form.password.data
+        confirm_password = form.confirm_password.data
+        user_type = request.form.get('user_type')  
+        if password != confirm_password:
+            flash('Passwords do not match. Please try again.', 'danger')
+            return redirect(url_for('project.signup'))
+        existing_user = User.query.filter_by(username=username).first()
+        if existing_user:
+            flash('Username is already taken. Please choose a different one.', 'danger')
+            return redirect(url_for('project.signup'))
+        existing_email = User.query.filter_by(email=email).first()
+        if existing_email:
+            flash('Email is already registered. Please use a different email.', 'danger')
+            return redirect(url_for('project.signup'))
+        hashed_password = bcrypt.generate_password_hash(request.form.get('password')).decode('utf-8')
+
+        new_user = User(username=username, email=email, password=hashed_password, user_type=user_type,is_admin=False)
+        db.session.add(new_user)
+        db.session.commit()
+        login_user(new_user)
+        flash('Account created successfully!', 'success')
+        return redirect(url_for('project.login'))
+    return render_template('signup.html', form=form)
+
+
+
+@project.route('/dashboard')
+@login_required
+def dashboard():
+    items = current_user.items
+    return render_template('dashboard.html', items=items)
+
+
+@project.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('project.login'))
+
+
+
+@project.route('/admin_dashboard')
+@login_required
+def admin_dashboard():
+    if not current_user.is_admin:
+        abort(403)  
+    pending_items = Item.query.filter_by(is_approved=False).all()
+    pending_events = Event.query.filter_by(is_approved=False).all()
+    pending_blogs = Article.query.filter_by(is_approved=False).all()
+    pending_vlogs = Vlog.query.filter_by(is_approved=False).all()
+    return render_template('admin_dashboard.html', items=pending_items, events=pending_events,blogs=pending_blogs, vlogs=pending_vlogs)
+
+
+@project.route('/approve_item/<int:item_id>', methods=['POST'])
+@login_required
+def approve_item(item_id):
+    if not current_user.is_admin:
+        abort(403)  
+    item = Item.query.get_or_404(item_id)
+    item.is_approved = True
+    db.session.commit()
+    flash('Item approved successfully.', 'success')
+    return redirect(url_for('project.index'))
+
+
+
+@project.route('/reject_item/<int:item_id>', methods=['POST'])
+@login_required
+def reject_item(item_id):
+    if not current_user.is_admin:
+        abort(403)  
+    item = Item.query.get_or_404(item_id)
+    db.session.delete(item)
+    db.session.commit()
+    flash('Item rejected successfully.', 'success')
+    return redirect(url_for('project.index'))
+
+
+
+@project.route('/approve_event/<int:event_id>', methods=['POST'])
+@login_required
+def approve_event(event_id):
+    if not current_user.is_admin:
+        abort(403)  
+    event = Event.query.get_or_404(event_id)
+    event.is_approved = True
+    db.session.commit()
+    flash('Event approved successfully.', 'success')
+    return redirect(url_for('project.index'))
+
+
+
+@project.route('/reject_event/<int:event_id>', methods=['POST'])
+@login_required
+def reject_event(event_id):
+    if not current_user.is_admin:
+        abort(403)  
+    event = Event.query.get_or_404(event_id)
+    db.session.delete(event)
+    db.session.commit()
+    flash('Event rejected successfully.', 'success')
+    return redirect(url_for('project.index'))
+
+
+
+@project.route('/approve_blog/<int:blog_id>', methods=['POST'])
+@login_required
+def approve_blog(blog_id):
+    if not current_user.is_admin:
+        abort(403)  
+    blog = Article.query.get_or_404(blog_id)
+    blog.is_approved = True
+    db.session.commit()
+    flash('Blog approved successfully.', 'success')
+    return redirect(url_for('project.admin_dashboard'))
+
+
+
+@project.route('/reject_blog/<int:blog_id>', methods=['POST'])
+@login_required
+def reject_blog(blog_id):
+    if not current_user.is_admin:
+        abort(403)  
+    blog = Article.query.get_or_404(blog_id)
+    db.session.delete(blog)
+    db.session.commit()
+    flash('Blog rejected successfully.', 'success')
+    return redirect(url_for('project.admin_dashboard'))
+
+
+
+@project.route('/approve_vlog/<int:vlog_id>', methods=['POST'])
+@login_required
+def approve_vlog(vlog_id):
+    if not current_user.is_admin:
+        abort(403)  
+    vlog = Vlog.query.get_or_404(vlog_id)
+    vlog.is_approved = True
+    db.session.commit()
+    flash('Vlog approved successfully.', 'success')
+    return redirect(url_for('project.admin_dashboard'))
+
+
+@project.route('/reject_vlog/<int:vlog_id>', methods=['POST'])
+@login_required
+def reject_vlog(vlog_id):
+    if not current_user.is_admin:
+        abort(403)  
+    vlog = Vlog.query.get_or_404(vlog_id)
+    db.session.delete(vlog)
+    db.session.commit()
+    flash('Vlog rejected successfully.', 'success')
+    return redirect(url_for('project.admin_dashboard'))
