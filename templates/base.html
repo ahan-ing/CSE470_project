@@ -4,6 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" />
     {% block head %}{% endblock %}
     <title>{% block title %}{% endblock %}</title>
@@ -25,9 +26,11 @@
                     <a class="nav-link" href="{{ url_for('project.upload_vlog') }}" style="color: aliceblue">Upload Vlogs</a>
                     <a class="nav-link" href="#" style="color: aliceblue">Volunteer</a>v
 
+
                 {% elif current_user.user_type == 'seller' %}
                     <a class="nav-link" href="{{ url_for('project.sell_item') }}" style="color: aliceblue">Sell</a>
                     <a class="nav-link" href="{{ url_for('project.item_listing') }}" style="color: aliceblue">Items</a>
+
 
                 {% elif current_user.user_type == 'buyer' %}
                     <a class="nav-link" href="{{ url_for('project.item_listing') }}" style="color: aliceblue">Buy</a>
@@ -38,13 +41,17 @@
                     <a class="nav-link" href="{{ url_for('project.upload_article') }}" style="color: aliceblue">Upload Blogs</a>
                     <a class="nav-link" href="{{ url_for('project.upload_vlog') }}" style="color: aliceblue">Upload Vlogs</a>
 
+
                 {% elif current_user.user_type == 'volunteer' %}
                     <a class="nav-link" href="{{ url_for('project.upload_article') }}" style="color: aliceblue">Upload Blogs</a>
                     <a class="nav-link" href="{{ url_for('project.upload_vlog') }}" style="color: aliceblue">Upload Vlogs</a>
 
-                    <a class="nav-link" href="#" style="color: aliceblue">Volunteer</a>
+
+                    <a class="nav-link" href="{{ url_for('project.volunteer_dashboard') }}" style="color: aliceblue">Volunteer</a>
+
+
                 {% endif %}
-                
+               
                 <a class="nav-link" href="{{ url_for('project.articles') }}" style="color: aliceblue">Blogs</a>
                 <a class="nav-link" href="{{ url_for('project.vlogs') }}" style="color: aliceblue">Vlogs</a>
             {% else %}
@@ -52,10 +59,11 @@
                 <a class="nav-link" href="{{ url_for('project.vlogs') }}" style="color: aliceblue">Vlogs</a>
                 <a class="nav-link" href="{{ url_for('project.login') }}" style="color: aliceblue">login</a>
 
+
             {% endif %}
-            
+           
             <a class="nav-link active" aria-current="page" href="{{ url_for('project.index') }}" style="color: aliceblue">Home</a>
-            
+           
             <form class="d-flex" role="search" action="{{ url_for('project.search') }}" method="get">
                 <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="query">
                 <button class="btn btn-outline-success" type="submit">Search</button>
@@ -63,9 +71,14 @@
         </div>
     </nav>
 
+
     {% block body %}{% endblock %}
+
 
     <!-- Optional JavaScript; choose one of the two! -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 </body>
 </html>
+
+
+

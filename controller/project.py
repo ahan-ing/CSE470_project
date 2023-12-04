@@ -9,7 +9,15 @@ from models.tables import *
 from models.cart import *
 from forms.form import *
 import traceback
-import traceback
+from models.tables import Event, User, db
+
+
+
+
+
+
+
+
 
 
 project = Blueprint('project', __name__)
@@ -17,9 +25,13 @@ bcrypt = Bcrypt()
 cart_items = {}
 
 
+
+
 @project.route('/')
 def index():
     return render_template('index.html')
+
+
 
 
 @project.route('/items')
@@ -32,13 +44,20 @@ def item_listing():
     else:
         items = Item.query.filter_by(is_approved=True).all()
 
+
     return render_template('items.html', items=items)
+
+
+
 
 
 
 @project.route('/imgages/<image_name>')
 def get_image(image_name):
     return send_from_directory(current_app.config['UPLOAD_FOLDER'], image_name)
+
+
+
 
 
 
@@ -60,7 +79,10 @@ def sell_item():
             db.session.commit()
             flash('Item added successfully. Awaiting admin approval.', 'success')
             return redirect(url_for('project.index'))
-    return render_template('sell.html', form=form), 200 
+    return render_template('sell.html', form=form), 200
+
+
+
 
 
 
@@ -71,6 +93,9 @@ def view_item(item_id):
     else:
         flash('You do not have permission to view this item.', 'danger')
         return redirect(url_for('project.index'))
+
+
+
 
 
 
@@ -87,12 +112,15 @@ def delete_item(item_id):
 
 
 
+
+
+
 @project.route('/update_item/<int:item_id>', methods=['GET', 'POST'])
 @login_required
 def update_item(item_id):
     item = Item.query.get_or_404(item_id)
     if item.seller_id != current_user.id:
-        abort(403) 
+        abort(403)
     form = UpdateItemForm()
     if form.validate_on_submit():
             item.title = form.title.data
@@ -103,10 +131,14 @@ def update_item(item_id):
             flash('Item successfully updated!', 'success')
             return redirect(url_for('project.items', item_id=item.id))
     return render_template('update.html', form=form, item=item)
-    
+   
+
 
 def load_user(user_id):
     return User.query.get(int(user_id))
+
+
+
 
 
 
@@ -124,6 +156,9 @@ def register():
 
 
 
+
+
+
 @project.route('/add_to_cart/<int:item_id>', methods=['POST'])
 def add_to_cart(item_id):
     item = Item.query.get(item_id)
@@ -133,6 +168,9 @@ def add_to_cart(item_id):
     else:
         flash('Item not found', 'error')
     return redirect(url_for('project.item_listing'))
+
+
+
 
 
 
@@ -150,7 +188,11 @@ def remove_from_cart(item_id):
     else:
         flash('Item not found', 'error')
 
+
     return redirect(url_for('project.view_cart'))
+
+
+
 
 
 
@@ -158,7 +200,9 @@ def remove_from_cart(item_id):
 def view_cart():
     items_in_cart = []
 
+
     print(f"cart_items type: {type(cart_items)}")  
+
 
     for item_id, quantity in cart_items.items():
         item = Item.query.get(item_id)
@@ -169,15 +213,20 @@ def view_cart():
 
 
 
+
+
+
 @project.route('/payment_confirmation')
 def payment_confirmation():
     try:
         items_in_cart = []
 
+
         for item_id, quantity in cart_items.items():
             item = Item.query.get(item_id)
             if item:
                 items_in_cart.append({'item': item, 'quantity': quantity})
+
 
         total_price = sum(int(cart_item['item'].price) * int(cart_item['quantity']) for cart_item in items_in_cart)
         return render_template('payment_confirmation.html', items_in_cart=items_in_cart, total_price=total_price)
@@ -186,6 +235,9 @@ def payment_confirmation():
         print(traceback.format_exc())
         flash('An error occurred during payment confirmation. Please try again later.', 'error')
         return redirect(url_for('project.view_cart'))  # Redirect to the cart if an error occurs
+
+
+
 
 
 
@@ -204,10 +256,16 @@ def checkout():
 
 
 
+
+
+
 @project.route('/articles')
 def articles():
     articles = Article.query.all()
     return render_template('articles.html', articles=articles)
+
+
+
 
 
 
@@ -222,6 +280,9 @@ def upload_article():
         db.session.commit()
         flash('Blog added successfully. Awaiting admin approval.', 'success')
     return render_template('upload_article.html')
+
+
+
 
 
 
@@ -240,9 +301,13 @@ def remove_article(article_id):
 
 
 
+################################################################################################
+
+
 @project.route('/events')
+@login_required
 def events():
-    events = Event.query.filter_by(is_approved=True).all()
+    events = Event.query.all()
     return render_template('events.html', events=events)
 
 
@@ -266,6 +331,9 @@ def create_event():
 
 
 
+
+
+
 @project.route('/events/<int:event_id>')
 def view_event(event_id):
     event = Event.query.get(event_id)
@@ -274,8 +342,10 @@ def view_event(event_id):
     return render_template('event_details.html', event=event)
 
 
+
+
 @project.route('/modify_event/<int:event_id>', methods=['GET', 'POST'])
-def modify_event(event_id): 
+def modify_event(event_id):
     event = Event.query.get(event_id)
     if not event:
         flash('Event not found', 'error')
@@ -287,6 +357,9 @@ def modify_event(event_id):
         flash('Event modified successfully!', 'success')
         return redirect(url_for('project.events'))
     return render_template('modify_event.html', event=event, form=form)
+
+
+
 
 
 
@@ -304,6 +377,60 @@ def delete_event(event_id):
 
 
 
+@project.route('/join_event/<int:event_id>', methods=['POST'])
+@login_required
+def join_event(event_id):
+    event = Event.query.get(event_id)
+    if event:
+        current_user.joined_events.append(event)
+        db.session.commit()
+        flash('You have joined the event!', 'success')
+    else:
+        flash('Event not found', 'danger')
+    return redirect(url_for('project.events'))
+
+
+
+
+# In controller/project.py
+
+
+@project.route('/volunteer_dashboard')
+@login_required
+def volunteer_dashboard():
+    # Fetch all events
+    all_events = Event.query.all()
+    return render_template('volunteer_dashboard.html', all_events=all_events)
+
+
+# In controller/project.py
+
+
+@project.route('/volunteer_join_event/<int:event_id>', methods=['POST'])
+@login_required
+def volunteer_join_event(event_id):
+    event = Event.query.get_or_404(event_id)
+
+
+    # Check if the user has already joined the event
+    if event not in current_user.joined_events:
+        current_user.joined_events.append(event)
+        db.session.commit()
+        flash('Successfully joined the event!', 'success')
+    else:
+        flash('You have already joined this event.', 'warning')
+
+
+    return redirect(url_for('project.volunteer_dashboard'))
+
+
+
+
+
+
+#####################################################################################################
+
+
 #@project.route('/search', methods=['GET'])
 #def search():
 #    query = request.args.get('query')  # Get the search query from the URL parameter
@@ -314,10 +441,14 @@ def delete_event(event_id):
     #else:
         #return render_template('search_results.html', results=[])
 
+
 @project.route('/vlogs')
 def vlogs():
     vlogs = Vlog.query.all()
     return render_template('vlogs.html', vlogs=vlogs)
+
+
+
 
 
 
@@ -339,6 +470,10 @@ def upload_vlog():
 
 
 
+
+
+
+
 @project.route('/remove_vlog/<int:vlog_id>', methods=['POST'])
 def remove_vlog(vlog_id):
     vlog = Vlog.query.get_or_404(vlog_id)
@@ -346,6 +481,10 @@ def remove_vlog(vlog_id):
     db.session.commit()
     flash('Vlog removed successfully!', 'success')
     return redirect(url_for('project.vlogs'))
+
+
+
+
 
 
 
@@ -365,6 +504,12 @@ from flask_bcrypt import Bcrypt
 
 
 
+
+
+
+
+
+
 @project.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -372,12 +517,15 @@ def login():
         password = request.form.get('password')
         user = User.query.filter_by(username=username).first()
         if user and bcrypt.check_password_hash(user.password, password):
-            login_user(user)     
+            login_user(user)    
             flash('Login successful!', 'success')
             return redirect(url_for('project.index'))
         else:
             flash('Login unsuccessful. Check username and password.', 'danger')
     return render_template('login.html')
+
+
+
 
 
 
@@ -403,6 +551,7 @@ def signup():
             return redirect(url_for('project.signup'))
         hashed_password = bcrypt.generate_password_hash(request.form.get('password')).decode('utf-8')
 
+
         new_user = User(username=username, email=email, password=hashed_password, user_type=user_type,is_admin=False)
         db.session.add(new_user)
         db.session.commit()
@@ -413,6 +562,9 @@ def signup():
 
 
 
+
+
+
 @project.route('/dashboard')
 @login_required
 def dashboard():
@@ -420,11 +572,16 @@ def dashboard():
     return render_template('dashboard.html', items=items)
 
 
+
+
 @project.route('/logout')
 @login_required
 def logout():
     logout_user()
     return redirect(url_for('project.login'))
+
+
+
 
 
 
@@ -440,6 +597,8 @@ def admin_dashboard():
     return render_template('admin_dashboard.html', items=pending_items, events=pending_events,blogs=pending_blogs, vlogs=pending_vlogs)
 
 
+
+
 @project.route('/approve_item/<int:item_id>', methods=['POST'])
 @login_required
 def approve_item(item_id):
@@ -450,6 +609,9 @@ def approve_item(item_id):
     db.session.commit()
     flash('Item approved successfully.', 'success')
     return redirect(url_for('project.index'))
+
+
+
 
 
 
@@ -466,6 +628,9 @@ def reject_item(item_id):
 
 
 
+
+
+
 @project.route('/approve_event/<int:event_id>', methods=['POST'])
 @login_required
 def approve_event(event_id):
@@ -476,6 +641,9 @@ def approve_event(event_id):
     db.session.commit()
     flash('Event approved successfully.', 'success')
     return redirect(url_for('project.index'))
+
+
+
 
 
 
@@ -492,6 +660,9 @@ def reject_event(event_id):
 
 
 
+
+
+
 @project.route('/approve_blog/<int:blog_id>', methods=['POST'])
 @login_required
 def approve_blog(blog_id):
@@ -502,6 +673,9 @@ def approve_blog(blog_id):
     db.session.commit()
     flash('Blog approved successfully.', 'success')
     return redirect(url_for('project.admin_dashboard'))
+
+
+
 
 
 
@@ -518,6 +692,9 @@ def reject_blog(blog_id):
 
 
 
+
+
+
 @project.route('/approve_vlog/<int:vlog_id>', methods=['POST'])
 @login_required
 def approve_vlog(vlog_id):
@@ -528,6 +705,8 @@ def approve_vlog(vlog_id):
     db.session.commit()
     flash('Vlog approved successfully.', 'success')
     return redirect(url_for('project.admin_dashboard'))
+
+
 
 
 @project.route('/reject_vlog/<int:vlog_id>', methods=['POST'])

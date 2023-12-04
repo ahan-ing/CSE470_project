@@ -12,3 +12,5 @@ class Cart(db.Model):
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey('user.id'))
     items = relationship('CartItem', backref='cart')
+
+

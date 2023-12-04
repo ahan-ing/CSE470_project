@@ -1,0 +1,31 @@
+<!-- In templates/volunteer_dashboard.html -->
+
+
+{% extends 'base.html' %}
+
+
+{% block title %}Volunteer Dashboard{% endblock %}
+
+
+{% block body %}
+  <h1>Volunteer Dashboard</h1>
+
+
+  <h2>All Events</h2>
+  <ul>
+    {% for event in all_events %}
+      <li>
+        <strong>Title:</strong> {{ event.title }}<br>
+        <strong>Description:</strong> {{ event.description }}<br>
+        <strong>Date:</strong> {{ event.date }}<br>
+        <strong>Location:</strong> {{ event.location }}<br>
+       
+        {% if event not in joined_events %}
+          <form action="{{ url_for('project.join_event', event_id=event.id) }}" method="post">
+            <button type="submit" class="btn btn-primary">Join Event</button>
+          </form>
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+{% endblock %}
