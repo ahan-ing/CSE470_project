@@ -1,0 +1,30 @@
+<!-- templates/joined_events.html -->
+{% extends 'base.html' %}
+
+{% block title %}Joined Events{% endblock %}
+
+{% block body %}
+  <div class="container">
+    <h1>Joined Events</h1>
+
+    {% if joined_events %}
+      <ul>
+        {% for event in joined_events %}
+          <li>
+            <strong>Title:</strong> {{ event.title }}<br>
+            <strong>Description:</strong> {{ event.description }}<br>
+            <strong>Date:</strong> {{ event.date }}<br>
+            <strong>Location:</strong> {{ event.location }}<br>
+
+            <!-- Form for canceling the joined event -->
+            <form action="{{ url_for('project.cancel_event', event_id=event.id) }}" method="post">
+              <button type="submit" class="btn btn-danger">Cancel Event</button>
+            </form>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>No joined events yet.</p>
+    {% endif %}
+  </div>
+{% endblock %}

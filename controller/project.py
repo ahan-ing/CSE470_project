@@ -10,19 +10,14 @@ from models.cart import *
 from forms.form import *
 import traceback
 from models.tables import Event, User, db
-
-
-
-
-
-
-
+from flask_migrate import Migrate
 
 
 
 project = Blueprint('project', __name__)
 bcrypt = Bcrypt()
 cart_items = {}
+
 
 
 
@@ -301,8 +296,6 @@ def remove_article(article_id):
 
 
 
-################################################################################################
-
 
 @project.route('/events')
 @login_required
@@ -375,22 +368,56 @@ def delete_event(event_id):
     return redirect(url_for('project.events'))
 
 
-
+############$$$$$$$$$$$$$$$$$$VOLUNTEER PART$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
 @project.route('/join_event/<int:event_id>', methods=['POST'])
 @login_required
 def join_event(event_id):
-    event = Event.query.get(event_id)
-    if event:
+    event = Event.query.get_or_404(event_id)
+
+    if current_user not in event.volunteers:
+        event.volunteers.append(current_user)
+        db.session.commit()
+
+        # Also add the event to the user's joined events
         current_user.joined_events.append(event)
         db.session.commit()
-        flash('You have joined the event!', 'success')
+
+        flash('You have successfully joined the event!', 'success')
     else:
-        flash('Event not found', 'danger')
-    return redirect(url_for('project.events'))
+        flash('You are already joined to this event.', 'warning')
+
+    # Redirect to the joined_events page
+    return redirect(url_for('project.joined_events'))
 
 
 
+
+@project.route('/joined_events')
+@login_required
+def joined_events():
+    # Get the joined events for the current user
+    joined_events = current_user.joined_events
+    return render_template('joined_events.html', title='Joined Events', joined_events=joined_events)
+
+
+
+@project.route('/cancel_event/<int:event_id>', methods=['POST'])
+@login_required
+def cancel_event(event_id):
+    # Get the event
+    event = Event.query.get_or_404(event_id)
+
+    # Check if the user has joined the event
+    if current_user in event.volunteers:
+        # Remove the user from the event's volunteers
+        event.volunteers.remove(current_user)
+        db.session.commit()
+        flash('You have successfully canceled your attendance to the event.', 'success')
+    else:
+        flash('You are not currently joined to this event.', 'danger')
+
+    return redirect(url_for('project.joined_events'))
 
 # In controller/project.py
 
