@@ -45,10 +45,11 @@
                 {% elif current_user.user_type == 'volunteer' %}
                     <a class="nav-link" href="{{ url_for('project.upload_article') }}" style="color: aliceblue">Upload Blogs</a>
                     <a class="nav-link" href="{{ url_for('project.upload_vlog') }}" style="color: aliceblue">Upload Vlogs</a>
-
-
                     <a class="nav-link" href="{{ url_for('project.volunteer_dashboard') }}" style="color: aliceblue">Volunteer</a>
                     <a class="nav-link" href="{{ url_for('project.joined_events') }}"style="color: aliceblue">View Joined Events</a>
+                    <a class="nav-link" href="{{ url_for('project.review') }}" style="color: aliceblue">Review</a>
+                    
+
 
 
                 {% endif %}

@@ -5,13 +5,6 @@ from flask_login import UserMixin
 from sqlalchemy import Table, ForeignKey
 from sqlalchemy.orm import relationship
 
-
-
-
-
-
-
-
 db=SQLAlchemy()
 
 
@@ -19,8 +12,6 @@ volunteer_event_association = Table('volunteer_event_association', db.Model.meta
     db.Column('volunteer_id', db.Integer, db.ForeignKey('user.id')),
     db.Column('event_id', db.Integer, db.ForeignKey('event.id'))
 )
-
-
 
 
 class User(db.Model, UserMixin):
@@ -32,7 +23,6 @@ class User(db.Model, UserMixin):
     user_type = db.Column(db.String(20), nullable=False)
     is_admin = db.Column(db.Boolean, default=False)
     joined_events = db.relationship('Event', secondary=volunteer_event_association, back_populates='volunteers')
-
 
 
 
@@ -90,8 +80,7 @@ class Event(db.Model):
     date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     location = db.Column(db.String(100), nullable=True)
     is_approved = db.Column(db.Boolean, default=False)
-    volunteers = db.relationship('User', secondary=volunteer_event_association, back_populates='joined_events')
-
+    volunteers = db.relationship('User', secondary=volunteer_event_association, back_populates='joined_events', cascade='all, delete')
 
 
 
@@ -108,3 +97,11 @@ class Vlog(db.Model):
 
     def get_embedded_link(self):
         return f"https://www.youtube.com/embed/{self.youtube_link.split('/')[-1]}"
+
+class Participant(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    event_id = db.Column(db.Integer, db.ForeignKey('event.id'), nullable=False)
+
+    # Add any additional fields if necessary
+

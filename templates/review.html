@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %}Review Page{% endblock %}
+
+{% block body %}
+<h1>Review Page</h1>
+<form method="POST" action="{{ url_for('project.submit_review') }}">
+    <div class="mb-3">
+        <label for="review_content" class="form-label">Write your review:</label>
+        <textarea class="form-control" id="review_content" name="review_content" rows="4" required></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit Review</button>
+</form>
+{% endblock %}

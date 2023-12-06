@@ -11,7 +11,9 @@ from forms.form import *
 import traceback
 from models.tables import Event, User, db
 from flask_migrate import Migrate
-
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy import delete
+from models.tables import Participant
 
 
 project = Blueprint('project', __name__)
@@ -355,17 +357,32 @@ def modify_event(event_id):
 
 
 
-
 @project.route('/delete_event/<int:event_id>', methods=['POST'])
+@login_required
 def delete_event(event_id):
     event = Event.query.get(event_id)
     if event:
+        # Directly delete association records for this event
+        delete_stmt = delete(volunteer_event_association).where(volunteer_event_association.c.event_id == event_id)
+        db.session.execute(delete_stmt)
+
+        # Now delete the event itself
         db.session.delete(event)
-        db.session.commit()
-        flash(f'Event "{event.title}" deleted successfully!', 'success')
+
+        try:
+            db.session.commit()
+            flash(f'Event "{event.title}" deleted successfully!', 'success')
+        except Exception as e:
+            db.session.rollback()
+            flash('An error occurred while deleting the event.', 'error')
+            # Log the error here if needed
+
+        return redirect(url_for('project.events'))
     else:
         flash('Event not found', 'error')
-    return redirect(url_for('project.events'))
+        return redirect(url_for('project.events'))
+
+
 
 
 ############$$$$$$$$$$$$$$$$$$VOLUNTEER PART$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
@@ -373,22 +390,36 @@ def delete_event(event_id):
 @project.route('/join_event/<int:event_id>', methods=['POST'])
 @login_required
 def join_event(event_id):
-    event = Event.query.get_or_404(event_id)
+    print("Attempting to join event", event_id)  # Debug print
 
-    if current_user not in event.volunteers:
-        event.volunteers.append(current_user)
-        db.session.commit()
+    try:
+        event = Event.query.get_or_404(event_id)
 
-        # Also add the event to the user's joined events
-        current_user.joined_events.append(event)
-        db.session.commit()
+        # Check if the current user is not already associated with the event
+        if current_user not in event.volunteers:
+            # Add the current user to the event's list of volunteers
+            event.volunteers.append(current_user)
+            
+            # Create a new participant record and add it to the session
+            participant = Participant(user_id=current_user.id, event_id=event_id)
+            db.session.add(participant)
 
-        flash('You have successfully joined the event!', 'success')
-    else:
-        flash('You are already joined to this event.', 'warning')
+            # Commit the session to save changes to the database
+            db.session.commit()
+            print("Joined event successfully")  # Debug print
 
-    # Redirect to the joined_events page
+            flash('You have successfully joined the event!', 'success')
+        else:
+            flash('You are already joined to this event.', 'warning')
+
+    except Exception as e:
+        db.session.rollback()  # Roll back the session in case of error
+        print("Error joining event:", e)  # Debug print
+        flash('An error occurred while joining the event.', 'danger')
+
     return redirect(url_for('project.joined_events'))
+
+
 
 
 
@@ -746,3 +777,25 @@ def reject_vlog(vlog_id):
     db.session.commit()
     flash('Vlog rejected successfully.', 'success')
     return redirect(url_for('project.admin_dashboard'))
+
+
+@project.route('/review')
+@login_required  # Ensure that only logged-in users can access the review page
+def review():
+    return render_template('review.html')
+
+
+@project.route('/submit_review', methods=['POST'])
+@login_required  # Ensure the user is logged in to submit a review
+def submit_review():
+    if request.method == 'POST':
+        review_content = request.form.get('review_content')
+
+        # Process the review_content (e.g., save it to the database)
+        # Replace this with your logic for handling reviews
+
+        flash('Review submitted successfully!', 'success')
+        return redirect(url_for('project.review'))
+
+    # Handle GET requests (e.g., if someone accesses the URL directly)
+    return redirect(url_for('project.review'))
