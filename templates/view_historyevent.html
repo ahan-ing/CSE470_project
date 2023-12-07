@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ event.title }}{% endblock %}
+
+{% block body %}
+<div class="container">
+    <h1>{{ event.title }}</h1>
+    <img
+          src="{{ url_for('project.get_image', image_name=event.image_path) }}"
+          alt="{{ event.title }}"
+          width="200"
+    />
+    <p> Details: {{ event.description }}</p>
+    <p>Date: {{ event.date }}</p>
+    <p>Location: {{ event.location }}</p>  
+    <a href="{{ url_for('project.review', history_event_id=event.id) }}" class="btn btn-primary mt-2">Review</a>
+</div>
+{% endblock %}

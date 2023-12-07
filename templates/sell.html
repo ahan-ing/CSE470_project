@@ -30,7 +30,10 @@ body %}
       {{ form.price(size=10, class="form-control",placeholder="Pick a good price
       - what would you pay?") }}
     </div>
-
+    <div class="form-group">
+      <label class="form-label" for="quantity">{{ form.quantity.label }}</label>
+      {{ form.quantity(size=10, class="form-control", placeholder="How many items are you selling?") }}
+    </div>
     <div class="form-group">
       <label class="form-label" for="image">{{ form.image.label }}</label>
       {{ form.image(class="form-control") }}

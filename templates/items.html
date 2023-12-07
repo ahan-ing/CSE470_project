@@ -11,6 +11,8 @@
         <h2>{{ item.title }}</h2>
         <p>{{ item.description }}</p>
         <p>Price: ${{ item.price }}</p>
+        <p>Quantity: ${{ item.quantity }}</p>
+
         <img
           src="{{ url_for('project.get_image', image_name=item.image_path) }}"
           alt="{{ item.title }}"
@@ -62,8 +64,8 @@
               method="POST"
               action="{{ url_for('project.add_to_cart', item_id=item.id) }}"
             >
-              <input type="hidden" name="item_id" value="{{ item.id }}" />
-              <button type="submit" class="btn btn-success">Add to Cart</button>
+            <input type="hidden" name="redirect_url" value="{{ url_for('project.view_cart') }}">
+            <button type="submit" class="btn btn-success">Add to Cart</button>
             </form>
           {% endif %}
         {% endif %}

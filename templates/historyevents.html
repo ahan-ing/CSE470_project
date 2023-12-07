@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}Events{% endblock %}
+{% block body %}
+<div class="container">
+  <h1>Events</h1>
+  {% for event in history_event %}
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title">{{ event.title }}</h5>
+      <p class="card-text">Location: {{ event.location }}</p>
+      <a href="{{ url_for('project.view_historyevent', history_event_id=event.id) }}" class="btn btn-primary mt-2">View Details</a>
+      <a href="{{ url_for('project.view_reviews', event_id=event.id) }}" class="btn btn-primary mt-2">View Reviews</a>
+
+    </div>
+  </div>
+  <br />
+  {% endfor %}
+</div>
+{% endblock %}

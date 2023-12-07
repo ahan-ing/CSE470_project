@@ -66,12 +66,13 @@ def sell_item():
         title = form.title.data
         description = form.description.data
         price = form.price.data
+        quantity=form.quantity.data
         image = form.image.data
         if image:
             filename = secure_filename(image.filename)
             image.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
             is_approved = current_user.is_admin
-            new_item = Item(title=title, description=description, price=price, image_path=filename, seller_id=current_user.id,is_approved=is_approved)
+            new_item = Item(title=title, description=description, price=price, quantity=quantity, image_path=filename, seller_id=current_user.id,is_approved=is_approved)
             db.session.add(new_item)
             db.session.commit()
             flash('Item added successfully. Awaiting admin approval.', 'success')
@@ -123,6 +124,7 @@ def update_item(item_id):
             item.title = form.title.data
             item.description = form.description.data
             item.price = form.price.data
+            item.quantity=form.quantity.data
             item.image_path = form.image_path.data
             db.session.commit()
             flash('Item successfully updated!', 'success')
@@ -156,14 +158,20 @@ def register():
 
 
 
+
 @project.route('/add_to_cart/<int:item_id>', methods=['POST'])
 def add_to_cart(item_id):
     item = Item.query.get(item_id)
+
     if item:
-        cart_items[item.id] = cart_items.get(item.id, 0) + 1
-        flash(f'Item {item.title} added to cart!', 'success')
+        if item.quantity is not None and cart_items.get(item.id, 0) >= item.quantity:
+            flash(f'Cannot add more of {item.title} to the cart. Available quantity: {item.quantity}', 'error')
+        else:
+            cart_items[item.id] = cart_items.get(item.id, 0) + 1
+            flash(f'Item {item.title} added to cart!', 'success')
     else:
         flash('Item not found', 'error')
+
     return redirect(url_for('project.item_listing'))
 
 
@@ -231,7 +239,7 @@ def payment_confirmation():
         print(f"An error occurred: {e}")
         print(traceback.format_exc())
         flash('An error occurred during payment confirmation. Please try again later.', 'error')
-        return redirect(url_for('project.view_cart'))  # Redirect to the cart if an error occurs
+        return redirect(url_for('project.view_cart'))  
 
 
 
@@ -300,30 +308,38 @@ def remove_article(article_id):
 
 
 @project.route('/events')
-@login_required
+
 def events():
-    events = Event.query.all()
+    events = Event.query.filter_by(is_approved=True).all()
     return render_template('events.html', events=events)
 
 
 @project.route('/create_event', methods=['GET', 'POST'])
+@login_required
 def create_event():
     form = CreateEventForm()
-    if form.validate_on_submit():
-        is_approved = current_user.is_admin
-        new_event = Event(
-            title=form.title.data,
-            description=form.description.data,
-            date=form.date.data,
-            location=form.location.data,
-            is_approved=is_approved
-        )
-        db.session.add(new_event)
-        db.session.commit()
-        flash('Event created successfully. Awaiting admin approval.', 'success')
-        return redirect(url_for('project.index'))
-    return render_template('create_event.html', form=form)
 
+    if form.validate_on_submit():
+        title = form.title.data
+        description = form.description.data
+        date = form.date.data
+        image = form.image.data
+        location = form.location.data
+        is_approved = current_user.is_admin
+        if image:
+            filename = secure_filename(image.filename)
+            image.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
+            is_approved = current_user.is_admin
+            new_event = Event( title=title, description=description, date=date,image_path=filename, location=location,is_approved=is_approved)
+            history_event = HistoryEvent(title=title,description=description,date=date,image_path=filename,location=location)
+            db.session.add(new_event)
+            db.session.add(history_event)
+            db.session.commit()
+
+            flash('Event created successfully. Awaiting admin approval.', 'success')
+            return redirect(url_for('project.index'))
+
+    return render_template('create_event.html', form=form)
 
 
 
@@ -335,6 +351,33 @@ def view_event(event_id):
     if not event:
         abort(404)  
     return render_template('event_details.html', event=event)
+
+
+
+
+@project.route('/historyevents')
+def historyevents():
+    events = HistoryEvent.query.all()
+    return render_template('historyevents.html', history_event=events)
+
+
+@project.route('/historyevents/<int:history_event_id>')
+def view_historyevent(history_event_id):
+    event = HistoryEvent.query.get(history_event_id)
+    reviews = EventReview.query.filter_by(history_event_id=history_event_id).all()
+
+    return render_template('view_historyevent.html', event=event, reviews=reviews)
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -362,11 +405,9 @@ def modify_event(event_id):
 def delete_event(event_id):
     event = Event.query.get(event_id)
     if event:
-        # Directly delete association records for this event
         delete_stmt = delete(volunteer_event_association).where(volunteer_event_association.c.event_id == event_id)
         db.session.execute(delete_stmt)
 
-        # Now delete the event itself
         db.session.delete(event)
 
         try:
@@ -375,7 +416,6 @@ def delete_event(event_id):
         except Exception as e:
             db.session.rollback()
             flash('An error occurred while deleting the event.', 'error')
-            # Log the error here if needed
 
         return redirect(url_for('project.events'))
     else:
@@ -423,13 +463,13 @@ def join_event(event_id):
 
 
 
-
 @project.route('/joined_events')
 @login_required
 def joined_events():
     # Get the joined events for the current user
     joined_events = current_user.joined_events
     return render_template('joined_events.html', title='Joined Events', joined_events=joined_events)
+
 
 
 
@@ -696,9 +736,19 @@ def approve_event(event_id):
         abort(403)  
     event = Event.query.get_or_404(event_id)
     event.is_approved = True
+    history_event = HistoryEvent(
+            title=event.title,
+            description=event.description,
+            date=event.date,
+            image_path=event.image_path,
+            location=event.location
+        )
+    db.session.add(event)
+    db.session.add(history_event)
+
     db.session.commit()
     flash('Event approved successfully.', 'success')
-    return redirect(url_for('project.index'))
+    return redirect(url_for('project.admin_dashboard'))
 
 
 
@@ -779,23 +829,44 @@ def reject_vlog(vlog_id):
     return redirect(url_for('project.admin_dashboard'))
 
 
-@project.route('/review')
-@login_required  # Ensure that only logged-in users can access the review page
-def review():
-    return render_template('review.html')
+@project.route('/review/<int:history_event_id>', methods=['GET', 'POST'])
+@login_required
+def review(history_event_id):
+    event = HistoryEvent.query.get(history_event_id)
+    form = ReviewForm()
 
+    if form.validate_on_submit():
+        rating = form.rating.data
+        review_text = form.review_text.data
 
-@project.route('/submit_review', methods=['POST'])
-@login_required  # Ensure the user is logged in to submit a review
-def submit_review():
-    if request.method == 'POST':
-        review_content = request.form.get('review_content')
+        # Create a new EventReview instance
+        review = EventReview(
+            rating=rating,
+            review_text=review_text,
+            user_id=current_user.id,
+            history_event_id=history_event_id,
+            usertype=current_user.user_type,
+            name=current_user.username 
+        )
 
-        # Process the review_content (e.g., save it to the database)
-        # Replace this with your logic for handling reviews
+        db.session.add(review)
+        db.session.commit()
 
         flash('Review submitted successfully!', 'success')
-        return redirect(url_for('project.review'))
 
-    # Handle GET requests (e.g., if someone accesses the URL directly)
-    return redirect(url_for('project.review'))
+    return render_template('review.html', event=event, form=form)
+
+
+def get_event_reviews(event_id):
+    reviews = EventReview.query.filter_by(history_event_id=event_id).all()
+    return reviews
+
+
+
+@project.route('/view_reviews/<int:event_id>')
+def view_reviews(event_id):
+    # Assuming you have a function to query reviews for a specific event
+    reviews = get_event_reviews(event_id)
+
+    return render_template('view_reviews.html', event_id=event_id, reviews=reviews)
+
