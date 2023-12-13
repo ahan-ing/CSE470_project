@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block title %}Events{% endblock %}
+{% block body %}
+  <style>
+    .events-page {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      margin-top: 50px; 
+    }
+
+    .event-card {
+      border: 1px solid #ddd;
+      padding: 15px;
+      margin-bottom: 20px;
+      width: 300px; 
+    }
+
+    .button-container {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+    }
+  </style>
+
+  <div class="container events-page">
+    <h1>Events</h1>
+    {% for event in history_event %}
+      <div class="event-card">
+        <div class="card-body">
+          <h5 class="card-title">{{ event.title }}</h5>
+          <p class="card-text">Location: {{ event.location }}</p>
+
+          <div class="button-container">
+            <a href="{{ url_for('project.view_historyevent', history_event_id=event.id) }}" class="btn btn-primary">View Details</a>
+            <a href="{{ url_for('project.view_reviews', event_id=event.id) }}" class="btn btn-primary">View Reviews</a>
+          </div>
+        </div>
+      </div>
+      <br />
+    {% endfor %}
+  </div>
+{% endblock %}

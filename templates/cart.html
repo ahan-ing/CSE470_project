@@ -1,34 +1,91 @@
-{% extends 'base.html' %} {% block body %} {% if items_in_cart %}
-<h1>Shopping Cart</h1>
+{% extends 'base.html' %}
 
-<ul>
-  {% for cart_item in items_in_cart %}
-  <li>
-    <h2>{{ cart_item.item.title }}</h2>
-    <p>Price: ${{ cart_item.item.price }}</p>
-    <p>Quantity: {{ cart_item.quantity }}</p>
-    <img
-      src="{{ url_for('project.get_image', image_name=cart_item.item.image_path) }}"
-      alt="{{ cart_item.item.title }}"
-      width="100"
-    />
-    <form
-      method="POST"
-      action="{{ url_for('project.remove_from_cart', item_id=cart_item.item.id) }}"
-    >
-      <button type="submit" class="btn btn-danger">Remove</button>
-    </form>
-  </li>
-  {% endfor %}
-</ul>
+{% block body %}
+    <style>
+        .card-container {
+            display: flex;
+            justify-content: center;
+        }
 
-<form method="POST" action="{{ url_for('project.checkout') }}">
-  <button type="submit" class="btn btn-primary">Proceed to Checkout</button>
-</form>
+        .card {
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 16px;
+            margin: 16px;
+            max-width: 300px;
+            text-align: center;
+        }
 
-{% else %}
-<p>
-  Your cart is empty.
-  <a href="{{ url_for('project.item_listing') }}">Browse items</a>
-</p>
-{% endif %} {% endblock %}
+        .button-container {
+            display: flex;
+            justify-content: center; /* Center align buttons */
+            margin-top: 10px;
+        }
+
+        .button-container button {
+            width: 48%;
+        }
+    </style>
+
+    {% if items_in_cart %}
+        <h1>Shopping Cart</h1>
+
+        <div class="card-container">
+            {% for cart_item in items_in_cart %}
+                <div class="card">
+                    <h2>{{ cart_item.item.title }}</h2>
+                    <p>Price: ${{ cart_item.item.price }}</p>
+                    <p>Quantity available: {{ cart_item.item.quantity }}</p>
+                    <form id="checkout-form" method="POST" action="{{ url_for('project.checkout') }}">
+                        <label for="quantity-{{ cart_item.item.id }}">Select Quantity:</label>
+                        <select id="quantity-{{ cart_item.item.id }}" name="quantity_{{ cart_item.item.id }}" onchange="updateTotalPrice(this, {{ cart_item.item.price }})">
+                            {% for quantity in range(1, cart_item.item.quantity + 1) %}
+                                <option value="{{ quantity }}" {% if quantity == cart_item.quantity %}selected{% endif %}>
+                                    {{ quantity }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <span id="total-price-{{ cart_item.item.id }}">Total Price: ${{ cart_item.item.price * cart_item.quantity }}</span>
+                        <br>
+                        <img
+                            src="{{ url_for('project.get_image', image_name=cart_item.item.image_path) }}"
+                            alt="{{ cart_item.item.title }}"
+                            width="100"
+                        />
+                        <div class="button-container">
+                            <button type="submit" class="btn btn-primary">Checkout</button>
+                        </div>
+                    </form>
+
+                    <!-- New form for the Remove button -->
+                    <form method="POST" action="{{ url_for('project.remove_from_cart', item_id=cart_item.item.id) }}">
+                        <div class="button-container">
+                            <!-- Center align the Remove button -->
+                            <button type="submit" class="btn btn-danger">Remove</button>
+                        </div>
+                    </form>
+                </div>
+            {% endfor %}
+        </div>
+
+    {% else %}
+        <p>
+            Your cart is empty.
+            <a href="{{ url_for('project.item_listing') }}">Browse items</a>
+        </p>
+    {% endif %}
+
+    <script>
+        function updateTotalPrice(selectElement, price) {
+            // Get the selected quantity
+            var quantity = selectElement.value;
+
+            // Calculate the total price
+            var totalPrice = price * quantity;
+
+            // Update the total price span
+            var totalPriceSpanId = 'total-price-' + selectElement.id.split('-')[1];
+            document.getElementById(totalPriceSpanId).innerText = 'Total Price: $' + totalPrice;
+        }
+    </script>
+{% endblock %}

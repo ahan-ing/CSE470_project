@@ -1,36 +1,29 @@
-<!-- search_results.html -->
-
-
 {% extends 'base.html' %}
-
 
 {% block title %}Search Results{% endblock %}
 
-
 {% block body %}
-    <h1>Search Results for "{{ query }}"</h1>
+    <h1 style="text-align: center;">Search Results for "{{ query }}"</h1>
 
+    <div style="display: flex; flex-wrap: wrap; justify-content: space-around;">
+        {% for item in items %}
+            <div style="border: 1px solid #ccc; padding: 15px; margin: 10px; text-align: center; width: 250px;">
+                <h2>{{ item.title }}</h2>
+                <p>{{ item.description }}</p>
+                <p>Price: ${{ item.price }}</p>
+                <img src="{{ url_for('project.get_image', image_name=item.image_path) }}" alt="{{ item.title }}" width="200" style="margin-bottom: 10px;">
 
-    {% if items %}
-        <ul>
-            {% for item in items %}
-                <li>
-                    <h2>{{ item.title }}</h2>
-                    <p>{{ item.description }}</p>
-                    <p>Price: ${{ item.price }}</p>
-                    <img src="{{ url_for('project.get_image', image_name=item.image_path) }}" alt="{{ item.title }}" width="200">
+                <form method="POST" action="{{ url_for('project.add_to_cart', item_id=item.id) }}">
+                    <input type="hidden" name="item_id" value="{{ item.id }}">
+                    <label for="quantity">Quantity:</label>
+                    <input type="number" name="quantity" value="1" min="1" required style="margin-right: 5px;">
+                    <button type="submit" class="btn btn-success" style="margin-top: 10px;">Add to Cart</button>
+                </form>
+            </div>
+        {% endfor %}
+    </div>
 
-
-                    <form method="POST" action="{{ url_for('project.add_to_cart', item_id=item.id) }}">
-                        <input type="hidden" name="item_id" value="{{ item.id }}">
-                        <label for="quantity">Quantity:</label>
-                        <input type="number" name="quantity" value="1" min="1" required>
-                        <button type="submit" class="btn btn-success">Add to Cart</button>
-                    </form>
-                </li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>No results found.</p>
+    {% if not items %}
+        <p style="text-align: center;">No results found.</p>
     {% endif %}
 {% endblock %}

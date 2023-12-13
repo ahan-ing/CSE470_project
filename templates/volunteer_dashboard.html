@@ -1,34 +1,67 @@
-<!-- templates/volunteer_dashboard.html -->
 {% extends 'base.html' %}
-
-{% block title %}Volunteer Dashboard{% endblock %}
+{% block title %}Events{% endblock %}
 
 {% block body %}
-  <div class="container">
-    <h1>Volunteer Dashboard</h1>
+  <style>
+    .events-page {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
 
+    .event-card {
+      border: 1px solid #ddd;
+      padding: 15px;
+      margin-bottom: 20px;
+      width: 300px; 
+      border-radius: 10px; 
+      overflow: hidden; 
+    }
+
+    .event-buttons {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 10px;
+    }
+  </style>
+
+  <div class="container events-page">
     <h2>All Events</h2>
-    <ul>
+    <ul id="event-list">
       {% for event in all_events %}
-        <li class="event-item">
-          <strong>Title:</strong> {{ event.title }}<br>
-          <strong>Description:</strong> {{ event.description }}<br>
-          <strong>Date:</strong> {{ event.date }}<br>
-          <strong>Location:</strong> {{ event.location }}<br>
+        {% if event not in joined_events %}
+          <li class="event-card" id="event-{{ event.id }}">
+            <strong>Title:</strong> {{ event.title }}<br>
+            <strong>Date:</strong> {{ event.date }}<br>
+            <strong>Location:</strong> {{ event.location }}<br>
+            
+            <div class="event-buttons">
+              <a href="{{ url_for('project.view_event', event_id=event.id) }}" class="btn btn-primary">View Details</a>
+              <button class="btn btn-primary join-event-btn" data-event-id="{{ event.id }}">Join Event</button>
+            </div>
 
-          {% if event not in joined_events %}
-            <!-- Form for joining the event -->
-            <form action="{{ url_for('project.volunteer_join_event', event_id=event.id) }}" method="post">
-              <button type="submit" class="btn btn-primary">Join Event</button>
-            </form>
-          {% else %}
-            <p class="joined-message">You have already joined this event. <a href="{{ url_for('project.joined_events') }}">View Joined Events</a></p>
-          {% endif %}
-        </li>
+            <div class="event-details" id="event-details-{{ event.id }}">
+            </div>
+          </li>
+        {% endif %}
       {% endfor %}
     </ul>
 
-    <!-- Link to Joined Events -->
-   
+    <a href="{{ url_for('project.joined_events') }}" class="btn btn-primary mt-2">View Joined Events</a>
+    <a class="btn btn-primary mt-4" href="{{ url_for('project.historyevents') }}">ALL EVENTS</a>
   </div>
-{% endblock %}
+
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  <script>
+    $(document).ready(function() {
+      $('.join-event-btn').on('click', function() {
+        var eventId = $(this).data('event-id');
+
+        $.post('{{ url_for("project.volunteer_join_event", event_id=0) }}'.replace('0', eventId), function(data) {
+          $('#event-' + eventId).remove();
+        });
+      });
+    });
+  </script>
+{%endblock%}

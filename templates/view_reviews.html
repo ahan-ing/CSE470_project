@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Event Reviews{% endblock %}
+
+{% block body %}
+  <style>
+    /* Add unique class for this page */
+    .event-reviews-page {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh; 
+      text-align: center;
+    }
+
+    .review-card {
+      border: 1px solid #ddd;
+      padding: 20px;
+      width: 400px; 
+      border-radius: 10px; 
+      overflow: hidden;
+    }
+
+    .card-body {
+      font-size: 16px;
+    }
+  </style>
+
+  <div class="container event-reviews-page">
+    <h2>Event Reviews for Event {{ event_id }}</h2>
+
+    {% for review in reviews %}
+      <div class="review-card">
+        <div class="card-body">
+          <h5 class="card-title">Rating: {{ review.rating }}</h5>
+          <p class="card-text">Review: {{ review.review_text }}</p>
+          <p class="card-text">User: {{ review.name }} ({{ review.usertype }})</p>
+        </div>
+      </div>
+      <br>
+    {% endfor %}
+  </div>
+{%endblock%}

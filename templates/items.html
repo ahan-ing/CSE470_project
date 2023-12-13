@@ -3,72 +3,92 @@
 {% block title %}Marketplace{% endblock %}
 
 {% block body %}
-  <h1>Today's Picks</h1>
+  <h1 style="text-align: center;">Today's Picks</h1>
 
-  <ul>
-    {% for item in items %}
-      <li>
-        <h2>{{ item.title }}</h2>
-        <p>{{ item.description }}</p>
-        <p>Price: ${{ item.price }}</p>
-        <img
-          src="{{ url_for('project.get_image', image_name=item.image_path) }}"
-          alt="{{ item.title }}"
-          width="200"
-        />
+  <div style="display: flex; justify-content: center; align-items: center; height: 100vh;">
+    <ul style="list-style-type: none; padding: 0; display: flex; flex-wrap: wrap; justify-content: center;">
+      {% for item in items %}
+        <li style="margin: 20px; background-color: #fff; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); padding: 20px;">
+          <h2 style="text-align: center;">{{ item.title }}</h2>
 
-        {% if current_user.is_authenticated %}
-          {% if current_user.user_type == 'admin' %}
-            <form
-              method="POST"
-              action="{{ url_for('project.delete_item', item_id=item.id) }}"
-            >
-              <button type="submit" class="btn btn-danger">Delete</button>
-            </form>
+          <div style="text-align: center;">
+            <img
+              src="{{ url_for('project.get_image', image_name=item.image_path) }}"
+              alt="{{ item.title }}"
+              width="200"
+              style="margin-bottom: 10px; border-radius: 8px;"
+            />
+          </div>
 
-            <form
-              method="POST"
-              action="{{ url_for('project.update_item', item_id=item.id) }}"
-            >
-              <button type="submit" class="btn btn-warning">Update</button>
-            </form>
+          <p>{{ item.description }}</p>
+          <p>Price: ${{ item.price }}</p>
+          <p>Quantity: {{ item.quantity }}</p>
 
-            <form
-              method="POST"
-              action="{{ url_for('project.add_to_cart', item_id=item.id) }}"
-            >
-              <input type="hidden" name="item_id" value="{{ item.id }}" />
-              <button type="submit" class="btn btn-success">Add to Cart</button>
-            </form>
+          {% if current_user.is_authenticated %}
+            {% if current_user.user_type == 'admin' %}
+              <div style="text-align: center;">
+                <form
+                  method="POST"
+                  action="{{ url_for('project.delete_item', item_id=item.id) }}"
+                  style="display: inline-block;"
+                >
+                  <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
 
-          {% elif current_user.user_type == 'seller' and item.seller_id == current_user.id %}
-            <form
-              method="POST"
-              action="{{ url_for('project.delete_item', item_id=item.id) }}"
-            >
-              <button type="submit" class="btn btn-danger">Delete</button>
-            </form>
+                <form
+                  method="POST"
+                  action="{{ url_for('project.update_item', item_id=item.id) }}"
+                  style="display: inline-block; margin-left: 10px;"
+                >
+                  <button type="submit" class="btn btn-warning">Update</button>
+                </form>
 
-            <form
-              method="POST"
-              action="{{ url_for('project.update_item', item_id=item.id) }}"
-            >
-              <button type="submit" class="btn btn-warning">Update</button>
-            </form>
+                <form
+                  method="POST"
+                  action="{{ url_for('project.add_to_cart', item_id=item.id) }}"
+                  style="display: inline-block; margin-left: 10px;"
+                >
+                  <input type="hidden" name="item_id" value="{{ item.id }}" />
+                  <button type="submit" class="btn btn-success">Add to Cart</button>
+                </form>
+              </div>
+
+            {% elif current_user.user_type == 'seller' and item.seller_id == current_user.id %}
+              <div style="text-align: center;">
+                <form
+                  method="POST"
+                  action="{{ url_for('project.delete_item', item_id=item.id) }}"
+                  style="display: inline-block;"
+                >
+                  <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+
+                <form
+                  method="POST"
+                  action="{{ url_for('project.update_item', item_id=item.id) }}"
+                  style="display: inline-block; margin-left: 10px;"
+                >
+                  <button type="submit" class="btn btn-warning">Update</button>
+                </form>
+              </div>
+            {% endif %}
+
+            {% if current_user.user_type == 'buyer' %}
+              <div style="text-align: center; margin-top: 10px;">
+                <form
+                  method="POST"
+                  action="{{ url_for('project.add_to_cart', item_id=item.id) }}"
+                  style="display: inline-block;"
+                >
+                  <input type="hidden" name="redirect_url" value="{{ url_for('project.view_cart') }}">
+                  <button type="submit" class="btn btn-success">Add to Cart</button>
+                </form>
+              </div>
+            {% endif %}
           {% endif %}
-
-          {% if current_user.user_type == 'buyer' %}
-            <form
-              method="POST"
-              action="{{ url_for('project.add_to_cart', item_id=item.id) }}"
-            >
-              <input type="hidden" name="item_id" value="{{ item.id }}" />
-              <button type="submit" class="btn btn-success">Add to Cart</button>
-            </form>
-          {% endif %}
-        {% endif %}
-      </li>
-    {% endfor %}
-  </ul>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
 
 {% endblock %}

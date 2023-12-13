@@ -1,6 +1,75 @@
-{% extends 'base.html' %} {% block title %}Welcome To Recycle Bin{% endblock %}
+{% extends 'base.html' %}
+{% block head %}
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@100;300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/fluid.css') }}?v={{ version }}" />
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}?v={{ version }}" />
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/media-query.css') }}?v={{ version }}" />
+{% endblock %}
 {% block body %}
+<header id="home">
+    <div class="header-box">
+        <div class="header-text-box">
+            <h1>EcoTrade</h1>
+            <div class="typing-effect">
+                <span id="text"></span><span id="cursor">|</span>
+            </div>
+        </div>
 
-<h1>Hello People!</h1>
+        <a href="https://www.conserve-energy-future.com/importance_of_recycling.php" target="blank" class="btn btn-full">Learn More</a>
+    </div>
+</header>
+    <footer>
+        <div class="row">
+            <p>&copy; Group 5 Project "EcoTrade: A Community-Driven Marketplace for Reuse and Recycling."</p>
+        </div>
+    </footer>
 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/respond.js/1.4.2/respond.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/selectivizr/1.0.2/selectivizr-min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/waypoints/4.0.1/jquery.waypoints.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        {% for message in messages %}
+        {% if message.tags == 'success'%}
+        Swal.fire({
+            title: 'Happy to have you!',
+            showClass: {
+            popup: 'animate__animated animate__fadeInDown'
+            },
+            hideClass: {
+            popup: 'animate__animated animate__fadeOutUp'
+            }
+        })
+        {% endif %}
+        {%endfor%}
+    </script>
+    <script>
+        const textElement = document.getElementById('text');
+        const text = 'A Community-Driven Marketplace for Reuse and Recycling.';
+        let charIndex = 0;
+
+        function type() {
+            if (charIndex < text.length) {
+                textElement.textContent += text.charAt(charIndex);
+                charIndex++;
+                setTimeout(type, 150); // Delay for typing animation
+            } else {
+                setTimeout(reset, 1500); // Delay before resetting
+            }
+        }
+
+        function reset() {
+            charIndex = 0;
+            textElement.textContent = '';
+            setTimeout(type, 150); // Start typing animation again
+        }
+
+        type();
+
+
+    </script>
 {% endblock %}

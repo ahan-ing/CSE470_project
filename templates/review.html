@@ -3,12 +3,42 @@
 {% block title %}Review Page{% endblock %}
 
 {% block body %}
-<h1>Review Page</h1>
-<form method="POST" action="{{ url_for('project.submit_review') }}">
-    <div class="mb-3">
-        <label for="review_content" class="form-label">Write your review:</label>
-        <textarea class="form-control" id="review_content" name="review_content" rows="4" required></textarea>
+  <style>
+    .review-page {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh; 
+      text-align: center;
+    }
+    .review-card {
+      border: 1px solid #ddd;
+      padding: 20px;
+      width: 400px; 
+    }
+    .submit-button {
+      margin-top: 20px;
+    }
+  </style>
+
+  <div class="container review-page">
+    <h1>Review Page</h1>
+    <div class="review-card">
+      <form method="POST" action="{{ url_for('project.review', history_event_id=event.id) }}">
+        {{ form.hidden_tag() }}
+        <div class="mb-3">
+          <label for="review_text" class="form-label"></label>
+          {{ form.review_text.label(class="form-label") }}
+          {{ form.review_text(class="form-control", id="review_text", rows="4", placeholder="Write your review", required=true) }}
+        </div>
+        <div class="mb-3">
+          <label for="rating" class="form-label"></label>
+          {{ form.rating.label(class="form-label") }}
+          {{ form.rating(class="form-select", id="rating", placeholder="Give Rating between 1-10", required=true) }}
+        </div>
+        <button type="submit" class="btn btn-primary submit-button">Submit Review</button>
+      </form>
     </div>
-    <button type="submit" class="btn btn-primary">Submit Review</button>
-</form>
-{% endblock %}
+  </div>
+{%endblock%}

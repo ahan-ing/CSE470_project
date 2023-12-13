@@ -1,16 +1,56 @@
 {% extends 'base.html' %}
 
-
 {% block title %}Upload Vlog{% endblock %}
 
-
 {% block body %}
-    <h1>Upload a Vlog</h1>
+  <style>
+    .card {
+      width: 300px;
+      margin: auto;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      margin-top: 50px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 16px;
+      box-sizing: border-box;
+    }
+
+    button {
+      background-color: #4caf50;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+  </style>
+
+  <div class="card">
+    <h2>Upload a Vlog</h2>
     <form method="POST" action="{{ url_for('project.upload_vlog') }}">
-        {{ form.hidden_tag() }}
-        {{ form.title.label }} {{ form.title }}
-        {{ form.description.label }} {{ form.description }}
-        {{ form.youtube_link.label }} {{ form.youtube_link }}
-        {{ form.submit }}
+      {{ form.hidden_tag() }}
+      <label for="title">{{ form.title.label }}</label>
+      {{ form.title }}
+
+      <label for="description">{{ form.description.label }}</label>
+      {{ form.description }}
+
+      <label for="youtube_link">{{ form.youtube_link.label }}</label>
+      {{ form.youtube_link }}
+
+      {{ form.submit }}
     </form>
+  </div>
 {% endblock %}

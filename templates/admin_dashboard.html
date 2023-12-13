@@ -1,79 +1,121 @@
-
 {% extends 'base.html' %}
 
 {% block title %}Admin Dashboard{% endblock %}
 
 {% block body %}
-  <h1>Admin Dashboard</h1>
+  <style>
+    .dashboard-container {
+      max-width: 800px;
+      margin: auto;
+      padding: 20px;
+    }
 
-  <h2>Pending Items</h2>
-  <ul>
-    {% for item in items %}
-      <li>
-        <strong>Title:</strong> {{ item.title }}<br>
-        <strong>Description:</strong> {{ item.description }}<br>
-        <strong>Price:</strong> ${{ item.price }}<br>
-        <img
-          src="{{ url_for('project.get_image', image_name=item.image_path) }}"
-          alt="{{ item.title }}"
-          width="200"
-        />
-        <form action="{{ url_for('project.approve_item', item_id=item.id) }}" method="post">
-          <button type="submit" class="btn btn-success">Approve</button>
-        </form>
-        <form action="{{ url_for('project.reject_item', item_id=item.id) }}" method="post">
-          <button type="submit" class="btn btn-danger">Reject</button>
-        </form>
-      </li>
-    {% endfor %}
-  </ul>
+    .pending-card {
+      background-color: #f4f4f4;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
 
-  <h2>Pending Events</h2>
-  <ul>
-    {% for event in events %}
-      <li>
-        <strong>Title:</strong> {{ event.title }}<br>
-        <strong>Description:</strong> {{ event.description }}<br>
-        <strong>Date:</strong> {{ event.date }}<br>
-        <form action="{{ url_for('project.approve_event', event_id=event.id) }}" method="post">
-          <button type="submit" class="btn btn-success">Approve</button>
-        </form>
-        <form action="{{ url_for('project.reject_event', event_id=event.id) }}" method="post">
-          <button type="submit" class="btn btn-danger">Reject</button>
-        </form>
-      </li>
-    {% endfor %}
-  </ul>
+    .approve-reject-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+    }
 
-  <h2>Pending Blogs</h2>
-  <ul>
-    {% for blog in blogs %}
-      <li>
-        <strong>Title:</strong> {{ blog.title }}<br>
-        <strong>Description:</strong> {{ blog.description }}<br>
-        <form action="{{ url_for('project.approve_blog', blog_id=blog.id) }}" method="post">
-          <button type="submit" class="btn btn-success">Approve</button>
-        </form>
-        <form action="{{ url_for('project.reject_blog', blog_id=blog.id) }}" method="post">
-          <button type="submit" class="btn btn-danger">Reject</button>
-        </form>
-      </li>
-    {% endfor %}
-  </ul>
+    .approve-button,
+    .reject-button {
+      width: 48%;
+    }
+  </style>
 
-  <h2>Pending Vlogs</h2>
-  <ul>
-    {% for vlog in vlogs %}
-      <li>
-        <strong>Title:</strong> {{ vlog.title }}<br>
-        <strong>Description:</strong> {{ vlog.description }}<br>
-        <form action="{{ url_for('project.approve_vlog', vlog_id=vlog.id) }}" method="post">
-          <button type="submit" class="btn btn-success">Approve</button>
-        </form>
-        <form action="{{ url_for('project.reject_vlog', vlog_id=vlog.id) }}" method="post">
-          <button type="submit" class="btn btn-danger">Reject</button>
-        </form>
-      </li>
-    {% endfor %}
-  </ul>
+  <div class="dashboard-container">
+    <div class="pending-card">
+      <h2>Pending Items</h2>
+      <ul>
+        {% for item in items %}
+          <li>
+            <strong>Title:</strong> {{ item.title }}<br>
+            <strong>Description:</strong> {{ item.description }}<br>
+            <strong>Price:</strong> ${{ item.price }}<br>
+            <img src="{{ url_for('project.get_image', image_name=item.image_path) }}" alt="{{ item.title }}" width="200">
+            <div class="approve-reject-buttons">
+              <form action="{{ url_for('project.approve_item', item_id=item.id) }}" method="post" class="approve-button">
+                <button type="submit" class="btn btn-success">Approve</button>
+              </form>
+              <form action="{{ url_for('project.reject_item', item_id=item.id) }}" method="post" class="reject-button">
+                <button type="submit" class="btn btn-danger">Reject</button>
+              </form>
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <div class="pending-card">
+      <h2>Pending Events</h2>
+      <ul>
+        <!-- Repeat the structure for Pending Events -->
+        {% for event in events %}
+          <li>
+            <strong>Title:</strong> {{ event.title }}<br>
+            <strong>Description:</strong> {{ event.description }}<br>
+            <strong>Date:</strong> {{ event.date }}<br>
+            <div class="approve-reject-buttons">
+              <form action="{{ url_for('project.approve_event', event_id=event.id) }}" method="post" class="approve-button">
+                <button type="submit" class="btn btn-success">Approve</button>
+              </form>
+              <form action="{{ url_for('project.reject_event', event_id=event.id) }}" method="post" class="reject-button">
+                <button type="submit" class="btn btn-danger">Reject</button>
+              </form>
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <div class="pending-card">
+      <h2>Pending Blogs</h2>
+      <ul>
+        <!-- Repeat the structure for Pending Blogs -->
+        {% for blog in blogs %}
+          <li>
+            <strong>Title:</strong> {{ blog.title }}<br>
+            <strong>Description:</strong> {{ blog.description }}<br>
+            <div class="approve-reject-buttons">
+              <form action="{{ url_for('project.approve_blog', blog_id=blog.id) }}" method="post" class="approve-button">
+                <button type="submit" class="btn btn-success">Approve</button>
+              </form>
+              <form action="{{ url_for('project.reject_blog', blog_id=blog.id) }}" method="post" class="reject-button">
+                <button type="submit" class="btn btn-danger">Reject</button>
+              </form>
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <div class="pending-card">
+      <h2>Pending Vlogs</h2>
+      <ul>
+        <!-- Repeat the structure for Pending Vlogs -->
+        {% for vlog in vlogs %}
+          <li>
+            <strong>Title:</strong> {{ vlog.title }}<br>
+            <strong>Description:</strong> {{ vlog.description }}<br>
+            <div class="approve-reject-buttons">
+              <form action="{{ url_for('project.approve_vlog', vlog_id=vlog.id) }}" method="post" class="approve-button">
+                <button type="submit" class="btn btn-success">Approve</button>
+              </form>
+              <form action="{{ url_for('project.reject_vlog', vlog_id=vlog.id) }}" method="post" class="reject-button">
+                <button type="submit" class="btn btn-danger">Reject</button>
+              </form>
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
 {% endblock %}

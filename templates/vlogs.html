@@ -1,23 +1,71 @@
 {% extends 'base.html' %}
 
-
 {% block title %}Vlogs{% endblock %}
 
-
 {% block body %}
+  <style>
+    .vlogs-container {
+      max-width: 800px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    .vlog-card {
+      background-color: #f4f4f4;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+
+    .vlog-title {
+      font-size: 1.5em;
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    .vlog-description {
+      color: #666;
+      margin-bottom: 15px;
+    }
+
+    .watch-link {
+      color: #007bff;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .remove-button {
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+  </style>
+
+  <div class="vlogs-container">
     <h1>Vlogs</h1>
 
-
     <ul>
-        {% for vlog in vlogs %}
-            <li>
-                <h2>{{ vlog.title }}</h2>
-                <p>{{ vlog.description }}</p>
-                <p><a href="{{ vlog.youtube_link }}" target="_blank">Watch on YouTube</a></p>
-                <form method="POST" action="{{ url_for('project.remove_vlog', vlog_id=vlog.id) }}">
-                    <button type="submit" class="btn btn-danger">Remove</button>
-                </form>
-            </li>
-        {% endfor %}
+      {% for vlog in vlogs %}
+        {% if vlog.is_approved %}
+            <li class="vlog-card">
+              <h2 class="vlog-title">{{ vlog.title }}</h2>
+              <p class="vlog-description">{{ vlog.description }}</p>
+              <p><a href="{{ vlog.youtube_link }}" target="_blank" class="watch-link">Watch on YouTube</a></p>
+          {% if current_user.is_authenticated %}
+              {% if current_user.user_type == 'admin' or current_user == vlog.author %}
+
+                  <form method="POST" action="{{ url_for('project.remove_vlog', vlog_id=vlog.id) }}">
+                    <button type="submit" class="remove-button">Remove</button>
+                  </form>
+              {% endif %}
+          {% endif %}
+        {% endif %}
+        </li>
+      {% endfor %}
     </ul>
+  </div>
 {% endblock %}

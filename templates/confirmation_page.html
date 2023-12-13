@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Payment Confirmation{% endblock %}
+
+{% block body %}
+  <h1>Payment Confirmation</h1>
+  <table>
+    <tr>
+      <th>Product Name</th>
+      <th>Picture</th>
+      <th>Price</th>
+      <th>Payment Type</th>
+      <th>User Name</th>
+      <th>Quantity</th>
+    </tr>
+    <tr>
+      <td>{{ purchase.product_name }}</td>
+      <td><img src="{{ purchase.picture }}" alt="Product Image"></td>
+      <td>{{ purchase.price }}</td>
+      <td>{{ purchase.payment_type }}</td>
+      <td>{{ purchase.user_name }}</td>
+      <td>{{ purchase.quantity }}</td>
+    </tr>
+  </table>
+{% endblock %}

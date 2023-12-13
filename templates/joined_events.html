@@ -1,30 +1,50 @@
-<!-- templates/joined_events.html -->
 {% extends 'base.html' %}
 
-{% block title %}Joined Events{% endblock %}
+{% block title %}Volunteer Dashboard{% endblock %}
 
 {% block body %}
-  <div class="container">
-    <h1>Joined Events</h1>
+  <style>
+    
+    .volunteer-dashboard {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      margin-top: 50px; 
+    }
+
+    .event-card {
+      border: 1px solid #ddd;
+      padding: 15px;
+      margin-bottom: 20px;
+      width: 300px; 
+      border-radius: 10px; 
+      overflow: hidden;
+    }
+
+    .cancel-event-btn {
+      margin-top: 10px;
+    }
+  </style>
+
+  <div class="container volunteer-dashboard">
+    <h1>Volunteer Dashboard</h1>
 
     {% if joined_events %}
-      <ul>
-        {% for event in joined_events %}
-          <li>
-            <strong>Title:</strong> {{ event.title }}<br>
-            <strong>Description:</strong> {{ event.description }}<br>
-            <strong>Date:</strong> {{ event.date }}<br>
-            <strong>Location:</strong> {{ event.location }}<br>
+      {% for event in joined_events %}
+        <div class="event-card">
+          <strong>Title:</strong> {{ event.title }}<br>
+          <strong>Description:</strong> {{ event.description }}<br>
+          <strong>Date:</strong> {{ event.date }}<br>
+          <strong>Location:</strong> {{ event.location }}<br>
 
-            <!-- Form for canceling the joined event -->
-            <form action="{{ url_for('project.cancel_event', event_id=event.id) }}" method="post">
-              <button type="submit" class="btn btn-danger">Cancel Event</button>
-            </form>
-          </li>
-        {% endfor %}
-      </ul>
+          <form action="{{ url_for('project.cancel_event', event_id=event.id) }}" method="post" class="cancel-event-btn">
+            <button type="submit" class="btn btn-danger">Cancel Event</button>
+          </form>
+        </div>
+      {% endfor %}
     {% else %}
       <p>No joined events yet.</p>
     {% endif %}
   </div>
-{% endblock %}
+{%endblock%}

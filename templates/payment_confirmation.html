@@ -2,7 +2,6 @@
 {% block body %}
   <h2>Payment Confirmation</h2>
   <div class="container">
-    <!-- Table Headers with Bold Style -->
     <div class="row mb-2" style="font-weight: bold;">
       <div class="col-md-6">Product</div>
       <div class="col-md-2">Quantity</div>
@@ -10,24 +9,78 @@
       <div class="col-md-2">Total Price</div>
     </div>
 
-    <!-- Items List -->
     {% for cart_item in items_in_cart %}
-      <div class="row mb-3">
-        <div class="col-md-6">{{ cart_item.item.title }}</div>
-        <div class="col-md-2">{{ cart_item.quantity }}</div>
-        <div class="col-md-2">{{ cart_item.item.price }}</div>
-        <div class="col-md-2">{{ cart_item.quantity * cart_item.item.price }}</div>
-      </div>
+    <div class="row mb-3">
+      <div class="col-md-6">{{ cart_item.item.title }}</div>
+      <div class="col-md-2">{{ cart_item.quantity }}</div>
+      <div class="col-md-2">{{ cart_item.item.price }}</div>
+      <div class="col-md-2">{{ cart_item.quantity * cart_item.item.price }}</div>
+    </div>
     {% endfor %}
-
-    <!-- Horizontal Line for Separation -->
+  
     <hr>
 
-    <!-- Total Sum -->
     <div class="row">
       <div class="col-md-10 text-right"><strong>Total:</strong></div>
       <div class="col-md-2">{{ total_price }}</div>
     </div>
-  </div>
-{% endblock %}
 
+    <div class="row mt-4">
+      <div class="col-md-12">
+        <button id="proceed-to-pay" class="btn btn-primary">Proceed to Pay</button>
+        <div id="payment-options" style="display: none;">
+          <input type="radio" id="cash-on-delivery" name="payment-method" value="cash-on-delivery">
+          <label for="cash-on-delivery">Cash On Delivery</label><br>
+          <input type="radio" id="pay-now" name="payment-method" value="pay-now">
+          <label for="pay-now">Pay Now</label><br>
+          <button id="confirm-payment" class="btn btn-success" style="display: none;">Confirm</button>
+          <img id="qr-code" src="/imgages/bkash.jpg" style="display: none;">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+  <script>
+    document.getElementById('proceed-to-pay').addEventListener('click', function() {
+      document.getElementById('payment-options').style.display = 'block';
+    });
+
+    document.getElementById('cash-on-delivery').addEventListener('change', function() {
+      if (this.checked) {
+        document.getElementById('confirm-payment').style.display = 'block';
+        document.getElementById('qr-code').style.display = 'none';
+      }
+    });
+
+    document.getElementById('pay-now').addEventListener('change', function() {
+      if (this.checked) {
+        document.getElementById('confirm-payment').style.display = 'block';
+        document.getElementById('qr-code').style.display = 'block';
+      }
+    });
+
+    document.getElementById('confirm-payment').addEventListener('click', function() {
+      if (document.getElementById('cash-on-delivery').checked || document.getElementById('pay-now').checked) {
+        alert('Congratulations! Your order has been placed.');
+        setTimeout(function() {
+          window.location.href = '/';
+        }, 1000);
+      }
+    });
+    document.getElementById('confirm-payment').addEventListener('click', function() {
+      if (document.getElementById('cash-on-delivery').checked || document.getElementById('pay-now').checked) {
+          fetch('/clear_cart', {method: 'POST'})
+              .then(response => response.json())
+              .then(data => {
+                  if (data.status === 'success') {
+                      alert('Congratulations! Your order has been placed.');
+                      setTimeout(function() {
+                          window.location.href = '/';
+                      }, 1000);
+                  }
+              });
+      }
+  });
+  </script>
+{% endblock %}

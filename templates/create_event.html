@@ -1,31 +1,94 @@
-<!-- templates/create_event.html -->
-{% extends 'base.html' %} {% block title %}Create Event{% endblock %} {% block
-head %}
-<link
-  rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"
-/>
-{% endblock %} {% block body %}
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-<div class="container">
-  <h1>Create Event</h1>
-  <form method="POST" action="{{ url_for('project.create_event') }}">
-    {{ form.hidden_tag() }}
-    <div class="mb-3">{{ form.title.label }} {{ form.title() }}</div>
-    <div class="mb-3">
-      {{ form.description.label }} {{ form.description() }}
-    </div>
-    <div class="mb-3">{{ form.date.label }} {{ form.date() }}</div>
-    <div class="mb-3">{{ form.location.label }} {{ form.location() }}</div>
+{% extends 'base.html' %} 
+{% block title %}Create Event{% endblock %} 
+{% block head %}
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"/>
+{% endblock %} 
+{% block body %}
+  <style>
+    .card-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
 
-    <button type="submit" class="btn btn-primary">Create Event</button>
-  </form>
-  {# Initialize flatpickr for the date field #}
-  <script>
-    flatpickr(".flatpickr", {
-      enableTime: true,
-      dateFormat: "Y-m-d H:i:S",
-    });
-  </script>
-</div>
+    .card {
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        padding: 16px;
+        max-width: 400px;
+        width: 100%;
+        text-align: left;
+    }
+
+    .mb-3 {
+        margin-bottom: 15px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    .form-group input,
+    .form-group select {
+        width: 100%;
+        padding: 8px;
+        box-sizing: border-box;
+    }
+
+    .btn-primary {
+        width: 100%;
+    }
+  </style>
+
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <div class="card-container">
+    <div class="card">
+      <h1>Create Event</h1>
+      <form method="POST" action="{{ url_for('project.create_event') }}" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        
+        <div class="form-group">
+          <label for="title">Title:</label>
+          {{ form.title() }}
+        </div>
+
+        <div class="form-group">
+          <label for="description">Description:</label>
+          {{ form.description() }}
+        </div>
+
+        <div class="form-group">
+          <label for="date">Date:</label>
+          {{ form.date() }}
+        </div>
+
+        <div class="form-group">
+          <label for="location">Location:</label>
+          {{ form.location() }}
+        </div>
+
+        <!-- Add the file input field for image -->
+        <div class="form-group">
+          <label for="image">Event Image:</label>
+          {{ form.image() }}
+        </div>
+
+        <button type="submit" class="btn btn-primary">Create Event</button>
+      </form>
+
+      {# Initialize flatpickr for the date field #}
+      <script>
+        flatpickr(".flatpickr", {
+          enableTime: true,
+          dateFormat: "Y-m-d H:i:S",
+        });
+      </script>
+    </div>
+  </div>
 {% endblock %}

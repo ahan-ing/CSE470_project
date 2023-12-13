@@ -1,47 +1,53 @@
-{% extends 'base.html' %} {% block title %}Sell Anything{% endblock %} {% block
-body %}
+{% extends 'base.html' %}
 
-<link rel="stylesheet" href="/static/css/style.css" />
-<h1 class="form-heading">
-  Sell your used items and help reduce your carbon footprint.
-</h1>
+{% block title %}
+  Sell Anything
+{% endblock %}
 
-<div class="form-container">
-  <form method="post" enctype="multipart/form-data" class="form">
-    {{ form.hidden_tag() }}
+{% block body %}
+  <div style="text-align: center; margin-top: 50px;">
+    <h1 style="margin-bottom: 20px; color: green;">
+      Sell your used items and help reduce your carbon footprint.
+    </h1>
+  </div>
 
-    <div class="form-group">
-      <label class="form-label" for="title">{{ form.title.label }}</label>
-      {{ form.title(size=32, class="form-control", placeholder="Write what you
-      want to sell") }}
+  <div style="background-color: #fff; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); padding: 20px; width: 400px; margin: auto; margin-top: 20px;" class="sell-anything-card">
+    <div class="form-container">
+      <form method="post" enctype="multipart/form-data" class="form">
+        {{ form.hidden_tag() }}
+
+        <div style="margin-bottom: 15px;" class="form-group">
+          <label class="form-label" for="title">{{ form.title.label }}</label>
+          {{ form.title(size=32, style="width: 100%; padding: 8px;", placeholder="Write what you want to sell") }}
+        </div>
+
+        <div style="margin-bottom: 15px;" class="form-group">
+          <label class="form-label" for="description">{{ form.description.label }}</label>
+          {{ form.description(cols=32, rows=4, style="width: 100%; padding: 8px;", placeholder="More details = more interested buyers!") }}
+        </div>
+
+        <div style="margin-bottom: 15px;" class="form-group">
+          <label class="form-label" for="price">{{ form.price.label }}</label>
+          {{ form.price(size=10, style="width: 100%; padding: 8px;", placeholder="Pick a good price - what would you pay?") }}
+        </div>
+
+        <div style="margin-bottom: 15px;" class="form-group">
+          <label class="form-label" for="quantity">{{ form.quantity.label }}</label>
+          {{ form.quantity(size=10, style="width: 100%; padding: 8px;", placeholder="How many items are you selling?") }}
+        </div>
+
+        <div style="margin-bottom: 15px;" class="form-group">
+          <label class="form-label" for="image">{{ form.image.label }}</label>
+          {{ form.image(style="width: 100%; padding: 8px;") }}
+        </div>
+
+        {{ form.is_approved() }}
+
+        <div style="display: flex; justify-content: space-between;" class="form-group button-group">
+          <input type="submit" value="Post ad" style="width: 48%;" class="btn btn-success" />
+          <a href="/items" style="width: 48%;" class="btn btn-secondary">Your listings</a>
+        </div>
+      </form>
     </div>
-
-    <div class="form-group">
-      <label class="form-label" for="description"
-        >{{ form.description.label }}</label
-      >
-      {{ form.description(cols=32, rows=4,
-      class="form-control",placeholder="More details = more interested buyers!")
-      }}
-    </div>
-
-    <div class="form-group">
-      <label class="form-label" for="price">{{ form.price.label }}</label>
-      {{ form.price(size=10, class="form-control",placeholder="Pick a good price
-      - what would you pay?") }}
-    </div>
-
-    <div class="form-group">
-      <label class="form-label" for="image">{{ form.image.label }}</label>
-      {{ form.image(class="form-control") }}
-    </div>
-    {{ form.is_approved() }}
-
-    <div class="form-group button-group">
-      <input type="submit" value="Post ad" class="btn btn-success" />
-      <a href="/items" class="btn btn-secondary">Your listings</a>
-    </div>
-  </form>
-</div>
-
+  </div>
 {% endblock %}

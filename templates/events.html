@@ -1,41 +1,75 @@
-<!-- templates/events.html -->
-{% extends 'base.html' %} {% block title %}Events{% endblock %} {% block body %}
-<div class="container">
-  <h1>Events</h1>
-  {% for event in events %}
-  <div class="card">
-    <div class="card-body">
-      <h5 class="card-title">{{ event.title }}</h5>
-      <p class="card-text">{{ event.description }}</p>
-      <p class="card-text">Date: {{ event.date }}</p>
-      <p class="card-text">Location: {{ event.location }}</p>
+{% extends 'base.html' %} 
+{% block title %}Events{% endblock %} 
+{% block body %}
+  <style>
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 20px;
+      padding: 20px;
+    }
 
+    .card {
+      width: 300px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
 
-      <!-- Modify and Delete Buttons -->
-      <div class="mt-3">
-        <a
-          href="{{ url_for('project.modify_event', event_id=event.id) }}"
-          class="btn btn-warning"
-          >Modify</a
-        >
-        <form method="POST" action="{{ url_for('project.delete_event', event_id=event.id) }}">
-            <button type="submit" class="btn btn-danger">Delete</button>
-        </form>
+    .card-body {
+      padding: 16px;
+      text-align: left;
+    }
+
+    .btn-group {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+    }
+
+    .btn-group .btn {
+      flex: 1;
+      margin-right: 5px;
+    }
+
+    .btn-group .btn:last-child {
+      margin-right: 0;
+    }
+
+    .btn-primary-create {
+      display: block;
+      margin-bottom: 20px;
+    }
+  </style>
+
+  <div class="container">
+    {% if current_user.is_authenticated and current_user.user_type == 'event_maker' or current_user.user_type == 'admin' %}
+      <a class="btn btn-primary btn-primary-create" href="{{ url_for('project.create_event') }}">Create Event</a>
+    {% endif %}
+    
+    {% for event in events %}
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">{{ event.title }}</h5>
+          <p class="card-text">{{ event.description }}</p>
+          <p class="card-text">Date: {{ event.date }}</p>
+          <p class="card-text">Location: {{ event.location }}</p>
+
+          {% if current_user.is_authenticated and (current_user == event.organizer or current_user.user_type == 'admin') %}
+            <div class="btn-group">
+              <a href="{{ url_for('project.modify_event', event_id=event.id) }}" class="btn btn-warning">Modify</a>
+              <form method="POST" action="{{ url_for('project.delete_event', event_id=event.id) }}">
+                <button type="submit" class="btn btn-danger">Delete</button>
+              </form>
+            </div>
+          {% endif %}
+
+          <a href="{{ url_for('project.view_event', event_id=event.id) }}" class="btn btn-primary mt-2">View Details</a>
+        </div>
       </div>
-     
-      <a
-        href="{{ url_for('project.view_event', event_id=event.id) }}"
-        class="btn btn-primary mt-2"
-        >View Details</a
-      >
-    </div>
+    {% endfor %}
   </div>
-  <br />
-  {% endfor %}
-  <a
-  class="btn btn-primary mt-4"
-  href="{{ url_for('project.create_event') }}"
-  >Create Event</a
->
-</div>
 {% endblock %}
