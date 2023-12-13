@@ -26,7 +26,13 @@ class User(db.Model, UserMixin):
     is_admin = db.Column(db.Boolean, default=False)
     joined_events = db.relationship('Event', secondary=volunteer_event_association, back_populates='volunteers')
     reviews = relationship('EventReview', back_populates='user')
+<<<<<<< HEAD
     
+=======
+
+
+
+>>>>>>> 3a214c52afa67e7fd249240eb7ae1f21e800d734
 
  
     def __init__(self, username, email, password, user_type,is_admin):
@@ -103,6 +109,15 @@ class HistoryEvent(db.Model):
     location = db.Column(db.String(100), nullable=True)
     reviews = relationship('EventReview', back_populates='history_event')
 
+class HistoryEvent(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.Text, nullable=True)
+    date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    image_path = Column(String(255), nullable=True)
+    location = db.Column(db.String(100), nullable=True)
+    reviews = relationship('EventReview', back_populates='history_event')
+
 
 
 
@@ -139,6 +154,28 @@ class EventReview(db.Model):
     history_event = relationship('HistoryEvent', back_populates='reviews')
     usertype = Column(String(50), nullable=False)  
     name = Column(String(100), nullable=False) 
+
+
+
+
+
+class EventReview(db.Model):
+    id = Column(Integer, primary_key=True)
+    rating = Column(Integer, nullable=False)
+    review_text = Column(String(255), nullable=True)
+
+    # Foreign keys
+    user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
+    history_event_id = Column(Integer, ForeignKey('history_event.id'), nullable=False)
+
+    # Relationship with User and HistoryEvent tables
+    user = relationship('User', back_populates='reviews')
+    history_event = relationship('HistoryEvent', back_populates='reviews')
+
+    # Additional columns
+    usertype = Column(String(50), nullable=False)  # Assuming 'event maker' or 'volunteer'
+    name = Column(String(100), nullable=False) 
+
 
 
 

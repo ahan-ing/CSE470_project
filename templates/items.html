@@ -5,11 +5,27 @@
 {% block body %}
   <h1 style="text-align: center;">Today's Picks</h1>
 
+<<<<<<< HEAD
   <div style="display: flex; justify-content: center; align-items: center; height: 100vh;">
     <ul style="list-style-type: none; padding: 0; display: flex; flex-wrap: wrap; justify-content: center;">
       {% for item in items %}
         <li style="margin: 20px; background-color: #fff; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); padding: 20px;">
           <h2 style="text-align: center;">{{ item.title }}</h2>
+=======
+  <ul>
+    {% for item in items %}
+      <li>
+        <h2>{{ item.title }}</h2>
+        <p>{{ item.description }}</p>
+        <p>Price: ${{ item.price }}</p>
+        <p>Quantity: ${{ item.quantity }}</p>
+
+        <img
+          src="{{ url_for('project.get_image', image_name=item.image_path) }}"
+          alt="{{ item.title }}"
+          width="200"
+        />
+>>>>>>> 3a214c52afa67e7fd249240eb7ae1f21e800d734
 
           <div style="text-align: center;">
             <img
@@ -86,9 +102,26 @@
               </div>
             {% endif %}
           {% endif %}
+<<<<<<< HEAD
         </li>
       {% endfor %}
     </ul>
   </div>
+=======
+
+          {% if current_user.user_type == 'buyer' %}
+            <form
+              method="POST"
+              action="{{ url_for('project.add_to_cart', item_id=item.id) }}"
+            >
+            <input type="hidden" name="redirect_url" value="{{ url_for('project.view_cart') }}">
+            <button type="submit" class="btn btn-success">Add to Cart</button>
+            </form>
+          {% endif %}
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+>>>>>>> 3a214c52afa67e7fd249240eb7ae1f21e800d734
 
 {% endblock %}

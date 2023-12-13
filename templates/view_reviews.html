@@ -3,6 +3,7 @@
 {% block title %}Event Reviews{% endblock %}
 
 {% block body %}
+<<<<<<< HEAD
   <style>
     /* Add unique class for this page */
     .event-reviews-page {
@@ -32,6 +33,13 @@
 
     {% for review in reviews %}
       <div class="review-card">
+=======
+  <div class="container">
+    <h2>Event Reviews for Event {{ event_id }}</h2>
+
+    {% for review in reviews %}
+      <div class="card">
+>>>>>>> 3a214c52afa67e7fd249240eb7ae1f21e800d734
         <div class="card-body">
           <h5 class="card-title">Rating: {{ review.rating }}</h5>
           <p class="card-text">Review: {{ review.review_text }}</p>
@@ -41,4 +49,8 @@
       <br>
     {% endfor %}
   </div>
+<<<<<<< HEAD
 {%endblock%}
+=======
+{% endblock %}
+>>>>>>> 3a214c52afa67e7fd249240eb7ae1f21e800d734

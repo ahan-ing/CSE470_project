@@ -3,6 +3,7 @@
 {% block title %}Review Page{% endblock %}
 
 {% block body %}
+<<<<<<< HEAD
   <style>
     .review-page {
       display: flex;
@@ -42,3 +43,21 @@
     </div>
   </div>
 {%endblock%}
+=======
+  <h1>Review Page</h1>
+  <form method="POST" action="{{ url_for('project.review', history_event_id=event.id) }}">
+    {{ form.hidden_tag() }}
+    <div class="mb-3">
+      <label for="review_text" class="form-label">Write your review:</label>
+      {{ form.review_text.label(class="form-label") }}
+      {{ form.review_text(class="form-control", id="review_text", rows="4", required=true) }}
+    </div>
+    <div class="mb-3">
+      <label for="rating" class="form-label">Rating:</label>
+      {{ form.rating.label(class="form-label") }}
+      {{ form.rating(class="form-select", id="rating", required=true) }}
+    </div>
+    <button type="submit" class="btn btn-primary">Submit Review</button>
+  </form>
+{% endblock %}
+>>>>>>> 3a214c52afa67e7fd249240eb7ae1f21e800d734

@@ -13,6 +13,7 @@
             margin: 0;
         }
 
+<<<<<<< HEAD
         .card {
             background-color: #fff;
             border-radius: 8px;
@@ -20,6 +21,38 @@
             padding: 20px;
             width: 400px;
         }
+=======
+    
+    <div class="form-group">
+        <label class="form-control-label">Product Name</label>
+        <p>{{ item.title }}</p>
+    </div>
+    <div class="form-group">
+        <label class="form-control-label">Description</label>
+        <p>{{ item.description }}</p>
+    </div>
+    <div class="form-group">
+        <label class="form-control-label">Price</label>
+        <p>${{ item.price }}</p>
+    </div>
+    <div class="form-group">
+        <label class="form-control-label">Price</label>
+        <p>${{ item.quantity }}</p>
+    </div>
+    <p> Update your item</p>
+    <div class="form-group">
+        {{ form.title.label(class="form-control-label") }}
+        {{ form.title(class="form-control") }}
+    </div>
+    <div class="form-group">
+        {{ form.description.label(class="form-control-label") }}
+        {{ form.description(class="form-control") }}
+    </div>
+    <div class="form-group">
+        {{ form.price.label(class="form-control-label") }}
+        {{ form.price(class="form-control") }}
+    </div>
+>>>>>>> 3a214c52afa67e7fd249240eb7ae1f21e800d734
 
         .form-group {
             margin-bottom: 20px;

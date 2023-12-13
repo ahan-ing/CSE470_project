@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+<<<<<<< HEAD
 {% block title %}Events{% endblock %}
 
 {% block body %}
@@ -27,10 +28,18 @@
   </style>
 
   <div class="container events-page">
+=======
+
+{% block title %}Events{% endblock %}
+
+{% block body %}
+  <div class="container">
+>>>>>>> 3a214c52afa67e7fd249240eb7ae1f21e800d734
     <h2>All Events</h2>
     <ul id="event-list">
       {% for event in all_events %}
         {% if event not in joined_events %}
+<<<<<<< HEAD
           <li class="event-card" id="event-{{ event.id }}">
             <strong>Title:</strong> {{ event.title }}<br>
             <strong>Date:</strong> {{ event.date }}<br>
@@ -42,14 +51,31 @@
             </div>
 
             <div class="event-details" id="event-details-{{ event.id }}">
+=======
+          <li class="event-item" id="event-{{ event.id }}">
+            <strong>Title:</strong> {{ event.title }}<br>
+            <strong>Date:</strong> {{ event.date }}<br>
+            <strong>Location:</strong> {{ event.location }}<br>
+            <a href="{{ url_for('project.view_event', event_id=event.id) }}" class="btn btn-primary mt-2">View Details</a>
+            <button class="btn btn-primary join-event-btn" data-event-id="{{ event.id }}">Join Event</button>
+            
+            <!-- Display the event details here -->
+            <div class="event-details" id="event-details-{{ event.id }}">
+              <!-- Add event details you want to display -->
+              <!-- For example: <strong>Details:</strong> {{ event.details }}<br> -->
+>>>>>>> 3a214c52afa67e7fd249240eb7ae1f21e800d734
             </div>
           </li>
         {% endif %}
       {% endfor %}
     </ul>
 
+<<<<<<< HEAD
     <a href="{{ url_for('project.joined_events') }}" class="btn btn-primary mt-2">View Joined Events</a>
     <a class="btn btn-primary mt-4" href="{{ url_for('project.historyevents') }}">ALL EVENTS</a>
+=======
+    <a href="{{ url_for('project.joined_events') }}">View Joined Events</a>
+>>>>>>> 3a214c52afa67e7fd249240eb7ae1f21e800d734
   </div>
 
   <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
@@ -64,4 +90,9 @@
       });
     });
   </script>
+<<<<<<< HEAD
 {%endblock%}
+=======
+  <a class="btn btn-primary mt-4" href="{{ url_for('project.historyevents') }}">ALL EVENTS</a>
+{% endblock %}
+>>>>>>> 3a214c52afa67e7fd249240eb7ae1f21e800d734

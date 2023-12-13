@@ -4,6 +4,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"/>
 {% endblock %} 
 {% block body %}
+<<<<<<< HEAD
   <style>
     .card-container {
         display: flex;
@@ -90,5 +91,34 @@
         });
       </script>
     </div>
+=======
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <div class="container">
+    <h1>Create Event</h1>
+    <form method="POST" action="{{ url_for('project.create_event') }}" enctype="multipart/form-data">
+      {{ form.hidden_tag() }}
+      
+      <div class="mb-3">{{ form.title.label }} {{ form.title() }}</div>
+      <div class="mb-3">{{ form.description.label }} {{ form.description() }}</div>
+      <div class="mb-3">{{ form.date.label }} {{ form.date() }}</div>
+      <div class="mb-3">{{ form.location.label }} {{ form.location() }}</div>
+
+      <!-- Add the file input field for image -->
+      <div class="mb-3">
+        {{ form.image.label }}
+        {{ form.image() }}
+      </div>
+
+      <button type="submit" class="btn btn-primary">Create Event</button>
+    </form>
+
+    {# Initialize flatpickr for the date field #}
+    <script>
+      flatpickr(".flatpickr", {
+        enableTime: true,
+        dateFormat: "Y-m-d H:i:S",
+      });
+    </script>
+>>>>>>> 3a214c52afa67e7fd249240eb7ae1f21e800d734
   </div>
 {% endblock %}
