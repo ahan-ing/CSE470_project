@@ -1,4 +1,3 @@
-<!-- templates/delete_event.html -->
 {% extends 'base.html' %}
 
 {% block title %}Delete Event{% endblock %}
@@ -7,7 +6,6 @@
 <div class="container">
     <h1>Delete Event</h1>
     <p>Are you sure you want to delete this event?</p>
-    <!-- Form for confirming event deletion -->
     <form method="POST" action="{{ url_for('project.delete_event', event_id=event.id) }}">
         {{ form.hidden_tag() }}
         <button type="submit" class="btn btn-danger">Delete Event</button>

@@ -1,4 +1,3 @@
-<!-- templates/modify_event.html -->
 {% extends 'base.html' %}
 
 {% block title %}Modify Event{% endblock %}
@@ -6,10 +5,8 @@
 {% block body %}
 <div class="container">
     <h1>Modify Event</h1>
-    <!-- Form for modifying event details -->
     <form method="POST" action="{{ url_for('project.modify_event', event_id=event.id) }}">
         {{ form.hidden_tag() }}
-        <!-- Form fields for modifying event details -->
         <div class="mb-3">
             {{ form.title.label }} {{ form.title() }}
         </div>
@@ -22,7 +19,6 @@
         <div class="mb-3">
             {{ form.location.label }} {{ form.location() }}
         </div>
-        <!-- Save Changes button -->
         <button type="submit" class="btn btn-primary">Save Changes</button>
     </form>
 </div>

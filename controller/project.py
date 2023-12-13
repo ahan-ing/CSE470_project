@@ -282,8 +282,6 @@ def create_event():
         date = form.date.data
         image = form.image.data
         location = form.location.data
-
-        # Ensure the selected date is not in the past
         if date.date() < datetime.utcnow().date():
             flash('Event date cannot be in the past.', 'error')
             return redirect(url_for('project.create_event'))

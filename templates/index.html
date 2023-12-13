@@ -56,16 +56,16 @@
             if (charIndex < text.length) {
                 textElement.textContent += text.charAt(charIndex);
                 charIndex++;
-                setTimeout(type, 150); // Delay for typing animation
+                setTimeout(type, 150); 
             } else {
-                setTimeout(reset, 1500); // Delay before resetting
+                setTimeout(reset, 1500); 
             }
         }
 
         function reset() {
             charIndex = 0;
             textElement.textContent = '';
-            setTimeout(type, 150); // Start typing animation again
+            setTimeout(type, 150); 
         }
 
         type();

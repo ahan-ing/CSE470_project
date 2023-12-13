@@ -1,43 +1,11 @@
 {% extends 'base.html' %}
 
-<<<<<<< HEAD
 {% block body %}
     <style>
         .card-container {
             display: flex;
             justify-content: center;
         }
-=======
-<ul>
-  {% for cart_item in items_in_cart %}
-  <li>
-    <h2>{{ cart_item.item.title }}</h2>
-    <p>Price: ${{ cart_item.item.price }}</p>
-    <p>Quantity available: {{ cart_item.item.quantity }}</p>
-
-      <label for="quantity-{{ cart_item.item.id }}">Select Quantity:</label>
-        <select id="quantity-{{ cart_item.item.id }}" name="quantity_{{ cart_item.item.id }}">
-          {% for quantity in range(1, cart_item.item.quantity + 1) %}
-            <option value="{{ quantity }}" {% if quantity == cart_item.quantity %}selected{% endif %}>
-              {{ quantity }}
-            </option>
-          {% endfor %}
-        </select>    
-      <img
-      src="{{ url_for('project.get_image', image_name=cart_item.item.image_path) }}"
-      alt="{{ cart_item.item.title }}"
-      width="100"
-    />
-    <form
-      method="POST"
-      action="{{ url_for('project.remove_from_cart', item_id=cart_item.item.id) }}"
-    >
-      <button type="submit" class="btn btn-danger">Remove</button>
-    </form>
-  </li>
-  {% endfor %}
-</ul>
->>>>>>> 3a214c52afa67e7fd249240eb7ae1f21e800d734
 
         .card {
             border: 1px solid #ccc;
@@ -89,10 +57,8 @@
                         </div>
                     </form>
 
-                    <!-- New form for the Remove button -->
                     <form method="POST" action="{{ url_for('project.remove_from_cart', item_id=cart_item.item.id) }}">
                         <div class="button-container">
-                            <!-- Center align the Remove button -->
                             <button type="submit" class="btn btn-danger">Remove</button>
                         </div>
                     </form>
@@ -109,13 +75,10 @@
 
     <script>
         function updateTotalPrice(selectElement, price) {
-            // Get the selected quantity
             var quantity = selectElement.value;
 
-            // Calculate the total price
             var totalPrice = price * quantity;
 
-            // Update the total price span
             var totalPriceSpanId = 'total-price-' + selectElement.id.split('-')[1];
             document.getElementById(totalPriceSpanId).innerText = 'Total Price: $' + totalPrice;
         }

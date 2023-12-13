@@ -157,17 +157,11 @@ class EventReview(db.Model):
     id = Column(Integer, primary_key=True)
     rating = Column(Integer, nullable=False)
     review_text = Column(String(255), nullable=True)
-
-    # Foreign keys
     user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
     history_event_id = Column(Integer, ForeignKey('history_event.id'), nullable=False)
-
-    # Relationship with User and HistoryEvent tables
     user = relationship('User', back_populates='reviews')
     history_event = relationship('HistoryEvent', back_populates='reviews')
-
-    # Additional columns
-    usertype = Column(String(50), nullable=False)  # Assuming 'event maker' or 'volunteer'
+    usertype = Column(String(50), nullable=False)  
     name = Column(String(100), nullable=False) 
 
 
