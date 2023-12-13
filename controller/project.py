@@ -93,7 +93,6 @@ def update_item(item_id):
         abort(403)
     form = UpdateItemForm(obj=item)  
     if form.validate_on_submit():
-<<<<<<< HEAD
         item.title = form.title.data
         item.description = form.description.data
         item.price = form.price.data
@@ -101,16 +100,6 @@ def update_item(item_id):
         db.session.commit()
         flash('Item successfully updated!', 'success')
         return redirect(url_for('project.item_listing', item_id=item.id))
-=======
-            item.title = form.title.data
-            item.description = form.description.data
-            item.price = form.price.data
-            item.quantity=form.quantity.data
-            item.image_path = form.image_path.data
-            db.session.commit()
-            flash('Item successfully updated!', 'success')
-            return redirect(url_for('project.items', item_id=item.id))
->>>>>>> 3a214c52afa67e7fd249240eb7ae1f21e800d734
     return render_template('update.html', form=form, item=item)
 
 
@@ -131,33 +120,10 @@ def register():
     return render_template('register.html', form=form)
 
 
-<<<<<<< HEAD
 @project.route('/add_to_cart/<int:item_id>', methods=['POST'])
 def add_to_cart(item_id):
     try:
         item = Item.query.get(item_id)
-=======
-
-
-
-
-
-@project.route('/add_to_cart/<int:item_id>', methods=['POST'])
-def add_to_cart(item_id):
-    item = Item.query.get(item_id)
-
-    if item:
-        if item.quantity is not None and cart_items.get(item.id, 0) >= item.quantity:
-            flash(f'Cannot add more of {item.title} to the cart. Available quantity: {item.quantity}', 'error')
-        else:
-            cart_items[item.id] = cart_items.get(item.id, 0) + 1
-            flash(f'Item {item.title} added to cart!', 'success')
-    else:
-        flash('Item not found', 'error')
-
-    return redirect(url_for('project.item_listing'))
-
->>>>>>> 3a214c52afa67e7fd249240eb7ae1f21e800d734
 
         if item:
             if item.quantity is not None and cart_items.get(item.id, 0) >= item.quantity:
@@ -243,17 +209,8 @@ def payment_confirmation():
         print(f"An error occurred: {e}")
         print(traceback.format_exc())
         flash('An error occurred during payment confirmation. Please try again later.', 'error')
-<<<<<<< HEAD
         return redirect(url_for('project.view_cart'))
     
-=======
-        return redirect(url_for('project.view_cart'))  
-
-
-
-
-
->>>>>>> 3a214c52afa67e7fd249240eb7ae1f21e800d734
 
 @project.route('/checkout', methods=['GET', 'POST'])
 def checkout():
@@ -310,10 +267,6 @@ def remove_article(article_id):
 
 
 @project.route('/events')
-<<<<<<< HEAD
-=======
-
->>>>>>> 3a214c52afa67e7fd249240eb7ae1f21e800d734
 def events():
     events = Event.query.filter_by(is_approved=True).all()
     return render_template('events.html', events=events)
@@ -322,7 +275,6 @@ def events():
 @login_required
 def create_event():
     form = CreateEventForm()
-<<<<<<< HEAD
 
     if form.validate_on_submit():
         title = form.title.data
@@ -353,8 +305,6 @@ def create_event():
             return redirect(url_for('project.index'))
 
     return render_template('create_event.html', form=form)
-=======
->>>>>>> 3a214c52afa67e7fd249240eb7ae1f21e800d734
 
     if form.validate_on_submit():
         title = form.title.data
@@ -498,11 +448,6 @@ def join_event(event_id):
 
 
 
-<<<<<<< HEAD
-=======
-
-
->>>>>>> 3a214c52afa67e7fd249240eb7ae1f21e800d734
 @project.route('/joined_events')
 @login_required
 def joined_events():
@@ -510,11 +455,6 @@ def joined_events():
     return render_template('joined_events.html', title='Joined Events', joined_events=joined_events)
 
 
-<<<<<<< HEAD
-=======
-
-
->>>>>>> 3a214c52afa67e7fd249240eb7ae1f21e800d734
 @project.route('/cancel_event/<int:event_id>', methods=['POST'])
 @login_required
 def cancel_event(event_id):
@@ -850,7 +790,6 @@ def review(history_event_id):
     if form.validate_on_submit():
         rating = form.rating.data
         review_text = form.review_text.data
-<<<<<<< HEAD
         review = EventReview(
             rating=rating,
             review_text=review_text,
@@ -860,19 +799,6 @@ def review(history_event_id):
             name=current_user.username 
         )
 
-=======
-
-        # Create a new EventReview instance
-        review = EventReview(
-            rating=rating,
-            review_text=review_text,
-            user_id=current_user.id,
-            history_event_id=history_event_id,
-            usertype=current_user.user_type,
-            name=current_user.username 
-        )
-
->>>>>>> 3a214c52afa67e7fd249240eb7ae1f21e800d734
         db.session.add(review)
         db.session.commit()
 
@@ -889,17 +815,9 @@ def get_event_reviews(event_id):
 
 @project.route('/view_reviews/<int:event_id>')
 def view_reviews(event_id):
-<<<<<<< HEAD
     reviews = get_event_reviews(event_id)
     return render_template('view_reviews.html', event_id=event_id, reviews=reviews)
 
 
 
 
-=======
-    # Assuming you have a function to query reviews for a specific event
-    reviews = get_event_reviews(event_id)
-
-    return render_template('view_reviews.html', event_id=event_id, reviews=reviews)
-
->>>>>>> 3a214c52afa67e7fd249240eb7ae1f21e800d734

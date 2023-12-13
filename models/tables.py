@@ -26,13 +26,7 @@ class User(db.Model, UserMixin):
     is_admin = db.Column(db.Boolean, default=False)
     joined_events = db.relationship('Event', secondary=volunteer_event_association, back_populates='volunteers')
     reviews = relationship('EventReview', back_populates='user')
-<<<<<<< HEAD
     
-=======
-
-
-
->>>>>>> 3a214c52afa67e7fd249240eb7ae1f21e800d734
 
  
     def __init__(self, username, email, password, user_type,is_admin):
